@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>9 STAR VPN & STORE & စျေးချို Online Shopping</title>
+    
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tweetnacl@1.0.3/nacl.min.js"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;900&family=Teko:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-neon: #ccff00;
+            --primary-glow: rgba(204, 255, 0, 0.4);
+            --accent-danger: #dc2626;
+            --danger-glow: rgba(220, 38, 38, 0.4);
+            --base-bg: #0a0a0c;
+        }
+
+        body { 
+            background-color: var(--base-bg); 
+            color: #ffffff; 
+            font-family: 'Montserrat', sans-serif; 
+            overflow-x: hidden; 
+        }
+
+        /* High-Performance Smooth World Map Background */
+        .map-overlay {
+            position: fixed; top: -15vh; left: -5vw; width: 110vw; height: 130vh; z-index: -2;
+            background-color: var(--primary-neon); 
+            -webkit-mask-image: url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_map_blank_without_borders.svg');
+            mask-image: url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_map_blank_without_borders.svg');
+            -webkit-mask-size: cover; mask-size: cover; opacity: 0.08; 
+        }
+
+        .txt-brand-danger { font-family: 'Teko', sans-serif; color: var(--accent-danger); text-shadow: 0 0 15px var(--danger-glow); letter-spacing: 1px; }
+        .txt-brand-neon { font-family: 'Montserrat', sans-serif; color: var(--primary-neon); text-shadow: 0 0 15px var(--primary-glow); font-weight: 900; }
+
+        /* Liquid Glassmorphism Cards */
+        .acrylic-card {
+            background: linear-gradient(145deg, rgba(30, 30, 35, 0.45) 0%, rgba(10, 10, 15, 0.65) 100%);
+            backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            border-left: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 28px; 
+            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1); 
+        }
+
+        /* iOS Inset Liquid Inputs */
+        .lux-input { 
+            background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05); 
+            box-shadow: inset 0 3px 6px rgba(0,0,0,0.6);
+            transition: all 0.4s; 
+        }
+        .lux-input:focus { 
+            background: rgba(204, 255, 0, 0.03); border-color: rgba(204, 255, 0, 0.4); outline: none; 
+        }
+
+        /* Neon Button */
+        .core-btn { 
+            background: linear-gradient(135deg, rgba(204, 255, 0, 0.9) 0%, rgba(153, 204, 0, 0.9) 100%);
+            color: #000; font-weight: 900; 
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 5px 15px var(--primary-glow); transition: all 0.3s; 
+        }
+        .core-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(204, 255, 0, 0.6); }
+        .core-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Telegram Send Button */
+        .tg-btn {
+            background: linear-gradient(135deg, #0088cc 0%, #005580 100%);
+            color: #fff; font-weight: 900; border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 5px 15px rgba(0, 136, 204, 0.4); transition: all 0.3s;
+        }
+        .tg-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 136, 204, 0.6); }
+
+        .anim-ascend { animation: ascendFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes ascendFade { 0% { opacity: 0; transform: translateY(30px) scale(0.98); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+        .rotate-mech { animation: mechRotate 3s linear infinite; }
+        @keyframes mechRotate { 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div class="map-overlay"></div>
+
+    <header class="w-full max-w-2xl text-center mb-6 anim-ascend">
+        <h1 class="txt-brand-danger text-2xl md:text-3xl mt-2">9 STAR VPN & STORE</h1>
+        <h1 class="txt-brand-danger text-xl md:text-2xl mt-1">& စျေးချို Online Shopping</h1>
+        <h1 class="txt-brand-neon text-2xl md:text-3xl mt-2">Premium Config Builder</h1>
+    </header>
+
+    <main class="w-full max-w-lg relative z-10 flex-grow flex flex-col justify-center">
+        
+        <section id="view-login" class="acrylic-card p-6 text-center w-full max-w-sm mx-auto anim-ascend">
+            <div class="mb-6">
+                <h2 class="text-white font-bold text-lg tracking-wider">SECURE ACCESS</h2>
+                <p class="text-xs text-gray-400 mt-1">Enter your Admin or Telegram OTP details.</p>
+            </div>
+            <div class="space-y-4 mb-6">
+                <input type="text" id="inp-username" placeholder="Username" class="w-full lux-input rounded-2xl px-4 py-3.5 text-sm text-white text-center font-medium">
+                <input type="password" id="inp-password" placeholder="Password" class="w-full lux-input rounded-2xl px-4 py-3.5 text-sm text-white text-center font-medium">
+            </div>
+            <button id="btn-login" class="core-btn w-full py-4 rounded-2xl font-bold uppercase tracking-widest text-xs relative">
+                <span>AUTHENTICATE</span>
+            </button>
+            <p id="msg-login-error" class="text-xs font-bold text-red-500 mt-4 hidden tracking-wide text-center"></p>
+        </section>
+
+        <section id="view-builder" class="hidden acrylic-card p-6 text-center w-full max-w-sm mx-auto anim-ascend">
+            <div class="space-y-4 mb-6">
+                <input type="text" id="inp-profile-name" placeholder="Custom Profile Name (Optional)" class="w-full lux-input rounded-2xl px-4 py-3.5 text-sm text-white text-center font-medium">
+            </div>
+            <button id="btn-execute-build" class="core-btn w-full py-4 rounded-2xl flex flex-col items-center gap-1 uppercase tracking-widest text-xs">
+                <div id="icon-idle">⚡</div>
+                <span id="lbl-btn-status">Build Configuration</span>
+            </button>
+            <p id="msg-build-status" class="text-xs font-bold hidden mt-4 tracking-wide text-center"></p>
+        </section>
+
+        <section id="view-results" class="hidden anim-ascend w-full max-w-lg mx-auto">
+            <div id="render-target-configs" class="space-y-6"></div>
+        </section>
+
+        <div id="canvas-vault-hidden" class="hidden"></div>
+    </main>
+
+    <script>
+        class VPNConfigArchitect {
+            constructor() {
+                // Cloudflare Worker API Endpoint
+                this.ENDPOINT = "https://curly-bonus-7ec5.zaychox9star.workers.dev";
+                
+                this.sessionToken = null;
+                this.userRole = null; 
+                this.payloadCache = null;
+                this.tgUserId = null; // Telegram user ID
+
+                this.ui = {
+                    views: { login: document.getElementById('view-login'), builder: document.getElementById('view-builder'), results: document.getElementById('view-results') },
+                    login: { user: document.getElementById('inp-username'), pass: document.getElementById('inp-password'), btn: document.getElementById('btn-login'), err: document.getElementById('msg-login-error') },
+                    builder: { name: document.getElementById('inp-profile-name'), buildBtn: document.getElementById('btn-execute-build'), status: document.getElementById('msg-build-status'), lblBtn: document.getElementById('lbl-btn-status') },
+                    containers: { output: document.getElementById('render-target-configs'), qrBuffer: document.getElementById('canvas-vault-hidden') }
+                };
+
+                this.initTelegram();
+                this.bootstrap();
+            }
+
+            // Telegram Web App မှ User ID ကို ရယူခြင်း
+            initTelegram() {
+                if (window.Telegram && window.Telegram.WebApp) {
+                    window.Telegram.WebApp.expand();
+                    const initData = window.Telegram.WebApp.initDataUnsafe;
+                    if (initData && initData.user) {
+                        this.tgUserId = initData.user.id;
+                    }
+                }
+            }
+
+            bootstrap() {
+                this.ui.login.btn.addEventListener('click', () => this.handleLogin());
+                this.ui.builder.buildBtn.addEventListener('click', () => this.compilePayload());
+                window.triggerAssetDownload = (type) => this.downloadAsset(type);
+                window.sendToTelegram = () => this.pushToTelegramChat();
+            }
+
+            async handleLogin() {
+                const user = this.ui.login.user.value.trim();
+                const pass = this.ui.login.pass.value.trim();
+                if(!user || !pass) return;
+
+                this.ui.login.btn.querySelector('span').innerText = "VERIFYING...";
+                this.ui.login.btn.disabled = true;
+                this.ui.login.err.classList.add('hidden');
+
+                try {
+                    const res = await fetch(`${this.ENDPOINT}/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: user, password: pass }) });
+                    const data = await res.json();
+                    
+                    if(data.success) {
+                        this.sessionToken = data.token;
+                        this.userRole = data.role;
+                        this.switchView('builder');
+                    } else throw new Error(data.error || "Login Failed");
+                } catch (e) {
+                    this.ui.login.err.innerText = e.message;
+                    this.ui.login.err.classList.remove('hidden');
+                } finally {
+                    this.ui.login.btn.querySelector('span').innerText = "AUTHENTICATE";
+                    this.ui.login.btn.disabled = false;
+                }
+            }
+
+            encodeBytesToBase64(uint8Array) { return btoa(String.fromCharCode.apply(null, uint8Array)); }
+            generateCryptoID() { return crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8); return v.toString(16); }); }
+            updateFeedback(msg, isError = false) { const el = this.ui.builder.status; el.textContent = msg; el.className = `text-xs font-bold block mt-4 ${isError ? 'text-red-500' : 'text-[#ccff00]'}`; el.classList.remove('hidden'); }
+            switchView(target) { Object.values(this.ui.views).forEach(v => v.classList.add('hidden')); this.ui.views[target].classList.remove('hidden'); }
+
+            // 🌟 Up-to-date VPN Guide (Myanmar)
+            generateDocumentation(fileName) {
+                return `================================================================
+🌟 9 STAR VPN & STORE & စျေးချို Online Shopping 🌟
+Premium High-Speed VPN Configuration Guide (မြန်မာလို ညွှန်ကြားချက်)
+================================================================
+
+❌ [အလွန်အရေးကြီးသော သတိပေးချက် - မဖတ်မနေရ] ❌
+----------------------------------------------------------------
+သင့်အတွက် ယခုထုတ်ပေးထားသော Config ဖိုင် (${fileName}.conf) သည်
+"Device တစ်ခုတည်းတွင်သာ အသုံးပြုရန် (1 Device Only)" သတ်မှတ်ထားပါသည်။
+
+⚠️ ဖုန်းတစ်လုံးထက်ပို၍ဖြစ်စေ၊ ဖုန်းနှင့်ကွန်ပျူတာပြိုင်တူဖြစ်စေ ချိတ်ဆက်မိပါက
+Cloudflare စနစ်မှ သင့် IP အား လုံးဝ Block ပြုလုပ်သွားမည်ဖြစ်ပြီး 
+အင်တာနက်ချိတ်ဆက်မှု လုံးဝ ပြတ်တောက်သွားမည် ဖြစ်သည်။
+----------------------------------------------------------------
+
+================================================================
+[၁] လိုအပ်သော VPN Apps များ ဒေါင်းလုဒ်ရယူရန် (Up-to-date Links)
+================================================================
+▶ ၁။ AmneziaWG VPN (အထူးအကြံပြုသည် - လိုင်းပိုငြိမ်ပြီး ပိုမြန်ပါသည် ⭐)
+- Android (Play Store): https://play.google.com/store/apps/details?id=org.amnezia.awg
+- iOS / Mac (App Store): https://apps.apple.com/us/app/amneziawg/id6478942365
+- Windows (PC): https://github.com/amnezia-vpn/amneziawg-windows-client/releases/latest
+
+▶ ၂။ WireGuard VPN (မူရင်း Protocol - ရွေးချယ်ရန်)
+- Android (Play Store): https://play.google.com/store/apps/details?id=com.wireguard.android
+- iOS / Mac (App Store): https://apps.apple.com/us/app/wireguard/id1441195209
+- Windows (PC): https://www.wireguard.com/install/
+
+================================================================
+[၂] အသုံးပြုနည်း အသေးစိတ် လမ်းညွှန် (Setup Guide)
+================================================================
+
+(က) .Conf ဖိုင်ဖြင့် ထည့်သွင်းနည်း (File ဖြင့် Import လုပ်နည်း)
+၁။ ပေးပို့ထားသော ${fileName}.conf ဖိုင်ကို မိမိဖုန်းထဲသို့ Save (ဒေါင်းလုဒ်) လုပ်ပါ။
+၂။ ဒေါင်းလုဒ်ဆွဲထားသော AmneziaWG (သို့) WireGuard App ကိုဖွင့်ပါ။
+၃။ App ၏ ညာဘက်အောက်ထောင့် (သို့) အပေါ်ထောင့်ရှိ အပေါင်းလက္ခဏာ (+) ကို နှိပ်ပါ။
+၄။ "Import from file or archive" ကိုရွေးချယ်ပြီး ခုနက Save ထားသော ဖိုင်ကို ရွေးပေးပါ။
+၅။ Profile နာမည်ပေါ်လာပါက ၎င်းဘေးရှိ ခလုတ်ကို ဖွင့် (On) ၍ စတင်အသုံးပြုနိုင်ပါပြီ။
+
+(ခ) QR Code ဖြင့် အသုံးပြုနည်း (Scan ဖတ်နည်း)
+၁။ ပေးပို့ထားသော QR ပုံကို မိမိအခြားဖုန်း သို့မဟုတ် ကွန်ပျူတာတွင် ဖွင့်ထားပါ။
+၂။ မိမိ VPN အသုံးပြုမည့် ဖုန်းရှိ App ထဲသို့သွားကာ (+) ခလုတ်ကို နှိပ်ပါ။
+၃။ "Create from QR code" (သို့မဟုတ် Scan QR) ကို ရွေးချယ်ပြီး ကင်မရာဖြင့် ပုံကိုဖတ်ပါ။
+၄။ Profile အမည်ကို စိတ်ကြိုက်ပေး၍ လွယ်ကူစွာ ချိတ်ဆက်အသုံးပြုနိုင်ပါသည်။
+
+================================================================
+ယုံကြည်စိတ်ချစွာ ဝယ်ယူအားပေးမှုအတွက် ကျေးဇူးအထူးတင်ရှိပါသည်။
+[ဆက်သွယ်ရန် Telegram: @MrRaptor / @ZayChoOnline]
+================================================================`;
+            }
+
+            async compilePayload() {
+                const rawName = this.ui.builder.name.value.trim();
+                this.ui.builder.buildBtn.disabled = true;
+                this.ui.builder.lblBtn.innerText = `Compiling Profile...`;
+
+                try {
+                    this.updateFeedback(`Authorizing & Connecting to Gateway...`);
+                    const naclKeys = nacl.box.keyPair();
+                    const pvt = this.encodeBytesToBase64(naclKeys.secretKey);
+                    const pub = this.encodeBytesToBase64(naclKeys.publicKey);
+
+                    const requestBody = { key: pub, install_id: this.generateCryptoID(), fcm_token: `${this.generateCryptoID()}:APA91b${this.generateCryptoID()}`, tos: new Date().toISOString(), model: "AutoBuilder", locale: "en_US" };
+
+                    const response = await fetch(`${this.ENDPOINT}/api/generate`, {
+                        method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${this.sessionToken}` }, body: JSON.stringify(requestBody)
+                    });
+
+                    const resData = await response.json();
+                    if (!response.ok || resData.success === false) throw new Error(resData.error || `Rejected: ${response.status}`);
+
+                    const finalTitle = rawName === "" ? "9STAR_" + (Math.floor(Math.random() * 9000) + 1000) : rawName;
+
+                    const wgConfText = `# =======================================================\n# 9 STAR VPN & STORE & စျေးချို Online Shopping\n# Config Profile: ${finalTitle}\n# =======================================================\n[Interface]\nPrivateKey = ${pvt}\nAddress = ${resData.config.interface.addresses.v4}/32, ${resData.config.interface.addresses.v6}/128\nDNS = 1.1.1.1, 1.0.0.1\nMTU = 1280\n\n[Peer]\nPublicKey = ${resData.config.peers[0].public_key}\nAllowedIPs = 0.0.0.0/0, ::/0\nEndpoint = 162.159.192.1:500`;
+
+                    this.ui.containers.qrBuffer.innerHTML = ""; 
+                    new QRCode(this.ui.containers.qrBuffer, { text: wgConfText, width: 220, height: 220, colorDark : "#0a0a0c", colorLight : "#ffffff", correctLevel: QRCode.CorrectLevel.M });
+
+                    await new Promise(r => setTimeout(r, 200));
+                    const cvs = document.createElement("canvas"); cvs.width = 250; cvs.height = 250;
+                    const ctx = cvs.getContext("2d"); ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, 250, 250);
+                    ctx.drawImage(this.ui.containers.qrBuffer.querySelector("canvas"), 15, 15);
+
+                    const extractedQR = cvs.toDataURL("image/png").split(',')[1];
+                    const docText = this.generateDocumentation(finalTitle);
+
+                    const zipArch = new JSZip();
+                    zipArch.file(`${finalTitle}.conf`, wgConfText);
+                    zipArch.file(`${finalTitle}_QR.png`, extractedQR, { base64: true });
+                    zipArch.file(`VPN_GUIDE.txt`, docText);
+                    const zipObjectBlob = await zipArch.generateAsync({ type: "blob" });
+
+                    this.payloadCache = { fileName: finalTitle, dataConf: wgConfText, imgCode: extractedQR, guideTxt: docText, archive: zipObjectBlob };
+
+                    this.drawOutputCard();
+                    this.switchView('results');
+
+                } catch (ex) {
+                    this.updateFeedback('❌ ' + ex.message, true);
+                } finally {
+                    this.ui.builder.buildBtn.disabled = false;
+                    this.ui.builder.lblBtn.innerText = "Build Configuration";
+                }
+            }
+
+            drawOutputCard() {
+                const targetConfig = this.payloadCache;
+                
+                // Telegram Web App ထဲမှာ ဖွင့်ထားရင် (tgUserId ရှိရင်) Send to Chat ခလုတ်ပြမည်၊ မရှိရင် ရိုးရိုး Download ပြမည်
+                const actionButtons = this.tgUserId 
+                    ? `<button id="btn-tg-send" onclick="window.sendToTelegram()" class="w-full py-4 tg-btn rounded-2xl text-[12px] uppercase tracking-widest flex items-center justify-center gap-2">
+                        <span>📥 Send Config & Guide to My Chat</span>
+                       </button>
+                       <p class="text-[10px] text-gray-400 mt-2 text-center">သင့် Telegram Chat ထဲသို့ ဖိုင်များ တိုက်ရိုက် ပို့ပေးမည်</p>`
+                    : `<button onclick="window.triggerAssetDownload('conf')" class="w-full py-3.5 core-btn rounded-2xl text-[11px] uppercase tracking-widest flex items-center justify-center gap-2 mb-2">
+                            <span>📄 Save .Conf File</span>
+                        </button>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="window.triggerAssetDownload('qr')" class="w-full bg-blue-600 py-2.5 rounded-2xl text-[10px] font-bold uppercase">🖼️ Save QR</button>
+                            <button onclick="window.triggerAssetDownload('zip')" class="w-full bg-red-600 py-2.5 rounded-2xl text-[10px] font-bold uppercase">📦 Full ZIP Pack</button>
+                        </div>`;
+
+                const cardTemplate = `
+                    <div class="acrylic-card p-5 anim-ascend">
+                        <div class="text-center mb-4">
+                            <span class="inline-block bg-[#ccff00]/10 text-[#ccff00] border border-[#ccff00]/30 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase">
+                                Config Generated
+                            </span>
+                            <h3 class="text-[#ccff00] font-bold text-xl mt-2 tracking-wide">${targetConfig.fileName}</h3>
+                        </div>
+                        <div class="flex justify-center mb-5">
+                            <div class="p-1.5 bg-white/10 rounded-2xl shadow-2xl backdrop-blur-md">
+                                <img src="data:image/png;base64,${targetConfig.imgCode}" class="rounded-xl w-40 h-40">
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            ${actionButtons}
+                        </div>
+                    </div>
+                `;
+                this.ui.containers.output.innerHTML = cardTemplate;
+            }
+
+            // Telegram သို့ လှမ်းပို့မည့် Function
+            async pushToTelegramChat() {
+                const btn = document.getElementById('btn-tg-send');
+                btn.disabled = true;
+                btn.innerHTML = `<span>⏳ ပို့ဆောင်နေပါသည်... စောင့်ပါ</span>`;
+
+                try {
+                    const payload = {
+                        chatId: this.tgUserId,
+                        fileName: this.payloadCache.fileName,
+                        confData: this.payloadCache.dataConf,
+                        qrBase64: this.payloadCache.imgCode,
+                        guideText: this.payloadCache.guideTxt
+                    };
+
+                    const response = await fetch(`${this.ENDPOINT}/api/send-telegram`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.ok) {
+                        btn.innerHTML = `<span>✅ အောင်မြင်စွာ ပို့ဆောင်ပြီးပါပြီ!</span>`;
+                        btn.classList.replace('tg-btn', 'core-btn');
+                        setTimeout(() => {
+                            if (window.Telegram && window.Telegram.WebApp) {
+                                window.Telegram.WebApp.close(); // ပို့ပြီးရင် Web App ကို အလိုအလျောက်ပိတ်ပေးမည်
+                            }
+                        }, 2500);
+                    } else {
+                        throw new Error("Failed to send.");
+                    }
+                } catch (err) {
+                    btn.disabled = false;
+                    btn.innerHTML = `<span>❌ Error: ပြန်လည်ကြိုးစားပါ</span>`;
+                }
+            }
+
+            downloadAsset(assetType) {
+                const blobTarget = this.payloadCache;
+                const anchor = document.createElement("a");
+                switch(assetType) {
+                    case 'conf': anchor.href = URL.createObjectURL(new Blob([blobTarget.dataConf], { type: 'application/x-wireguard-profile' })); anchor.download = `${blobTarget.fileName}.conf`; break;
+                    case 'qr': anchor.href = "data:image/png;base64," + blobTarget.imgCode; anchor.download = `${blobTarget.fileName}_QR.png`; break;
+                    case 'zip': anchor.href = URL.createObjectURL(blobTarget.archive); anchor.download = `${blobTarget.fileName}_Package.zip`; break;
+                }
+                document.body.appendChild(anchor); anchor.click(); document.body.removeChild(anchor);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => new VPNConfigArchitect());
+    </script>
+</body>
+</html>
