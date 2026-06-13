@@ -10,24 +10,118 @@
     <script src="https://cdn.jsdelivr.net/npm/tweetnacl@1.0.3/nacl.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;900&family=Teko:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary-neon: #ccff00; --primary-glow: rgba(204, 255, 0, 0.4); --accent-danger: #dc2626; --danger-glow: rgba(220, 38, 38, 0.4); --base-bg: #0a0a0c; }
-        body { background-color: var(--base-bg); color: #ffffff; font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
-        .map-overlay { position: fixed; top: -15vh; left: -5vw; width: 110vw; height: 130vh; z-index: -2; background-color: var(--primary-neon); -webkit-mask-image: url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_map_blank_without_borders.svg'); mask-image: url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_map_blank_without_borders.svg'); -webkit-mask-size: cover; mask-size: cover; opacity: 0.08; }
-        .backdrop-glow-layer { position: fixed; top: -10vh; left: 0; width: 100vw; height: 120vh; z-index: -1; background: radial-gradient(circle at 15% 20%, rgba(220, 38, 38, 0.15) 0%, transparent 40%), radial-gradient(circle at 85% 80%, rgba(204, 255, 0, 0.05) 0%, transparent 40%); pointer-events: none; }
-        .txt-brand-danger { font-family: 'Teko', sans-serif; color: var(--accent-danger); text-shadow: 0 0 15px var(--danger-glow); letter-spacing: 1px; }
-        .txt-brand-neon { font-family: 'Montserrat', sans-serif; color: var(--primary-neon); text-shadow: 0 0 15px var(--primary-glow); font-weight: 900; }
-        .acrylic-card { background: linear-gradient(145deg, rgba(30, 30, 35, 0.45) 0%, rgba(10, 10, 15, 0.65) 100%); backdrop-filter: blur(24px); border-top: 1px solid rgba(255, 255, 255, 0.15); border-left: 1px solid rgba(255, 255, 255, 0.05); border-radius: 28px; box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1); }
-        .lux-input { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: inset 0 3px 6px rgba(0,0,0,0.6); transition: all 0.4s; }
-        .lux-input:focus { background: rgba(204, 255, 0, 0.03); border-color: rgba(204, 255, 0, 0.4); outline: none; }
-        .core-btn { background: linear-gradient(135deg, rgba(204, 255, 0, 0.9) 0%, rgba(153, 204, 0, 0.9) 100%); color: #000; font-weight: 900; border: 1px solid rgba(255, 255, 255, 0.4); box-shadow: 0 5px 15px var(--primary-glow); transition: all 0.3s; }
-        .core-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(204, 255, 0, 0.6); }
-        .core-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .tg-btn { background: linear-gradient(135deg, #0088cc 0%, #005580 100%); color: #fff; font-weight: 900; border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 5px 15px rgba(0, 136, 204, 0.4); transition: all 0.3s; }
-        .tg-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 136, 204, 0.6); }
-        .btn-water-blue { background: linear-gradient(135deg, rgba(37, 99, 235, 0.8) 0%, rgba(30, 64, 175, 0.9) 100%); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3); transition: all 0.3s; }
-        .btn-water-red { background: linear-gradient(135deg, rgba(220, 38, 38, 0.8) 0%, rgba(153, 27, 27, 0.9) 100%); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; box-shadow: 0 5px 15px rgba(220, 38, 38, 0.3); transition: all 0.3s; }
-        .anim-ascend { animation: ascendFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        @keyframes ascendFade { 0% { opacity: 0; transform: translateY(30px) scale(0.98); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+        :root { 
+            --primary-neon: #ccff00;
+            --primary-glow: rgba(204, 255, 0, 0.4); 
+            --accent-danger: #dc2626; 
+            --danger-glow: rgba(220, 38, 38, 0.4); 
+            --base-bg: #0a0a0c;
+        }
+        body { 
+            background-color: var(--base-bg); 
+            color: #ffffff; 
+            font-family: 'Montserrat', sans-serif; 
+            overflow-x: hidden;
+        }
+        .map-overlay { 
+            position: fixed; 
+            top: -15vh; left: -5vw; 
+            width: 110vw; height: 130vh;
+            z-index: -2; 
+            background-color: var(--primary-neon); 
+            -webkit-mask-image: url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_map_blank_without_borders.svg'); 
+            mask-image: url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_map_blank_without_borders.svg'); 
+            -webkit-mask-size: cover; mask-size: cover; 
+            opacity: 0.08;
+        }
+        .backdrop-glow-layer { 
+            position: fixed; 
+            top: -10vh; left: 0; 
+            width: 100vw; height: 120vh;
+            z-index: -1; 
+            background: radial-gradient(circle at 15% 20%, rgba(220, 38, 38, 0.15) 0%, transparent 40%), 
+                        radial-gradient(circle at 85% 80%, rgba(204, 255, 0, 0.05) 0%, transparent 40%);
+            pointer-events: none; 
+        }
+        .txt-brand-danger { 
+            font-family: 'Teko', sans-serif; 
+            color: var(--accent-danger);
+            text-shadow: 0 0 15px var(--danger-glow); 
+            letter-spacing: 1px; 
+        }
+        .txt-brand-neon { 
+            font-family: 'Montserrat', sans-serif;
+            color: var(--primary-neon); 
+            text-shadow: 0 0 15px var(--primary-glow); 
+            font-weight: 900; 
+        }
+        .acrylic-card { 
+            background: linear-gradient(145deg, rgba(30, 30, 35, 0.45) 0%, rgba(10, 10, 15, 0.65) 100%);
+            backdrop-filter: blur(24px); 
+            border-top: 1px solid rgba(255, 255, 255, 0.15); 
+            border-left: 1px solid rgba(255, 255, 255, 0.05); 
+            border-radius: 28px;
+            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+        .lux-input { 
+            background: rgba(0, 0, 0, 0.4); 
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05); 
+            box-shadow: inset 0 3px 6px rgba(0,0,0,0.6); 
+            transition: all 0.4s;
+        }
+        .lux-input:focus { 
+            background: rgba(204, 255, 0, 0.03); 
+            border-color: rgba(204, 255, 0, 0.4);
+            outline: none; 
+        }
+        .core-btn { 
+            background: linear-gradient(135deg, rgba(204, 255, 0, 0.9) 0%, rgba(153, 204, 0, 0.9) 100%);
+            color: #000; 
+            font-weight: 900; 
+            border: 1px solid rgba(255, 255, 255, 0.4); 
+            box-shadow: 0 5px 15px var(--primary-glow); 
+            transition: all 0.3s;
+        }
+        .core-btn:hover:not(:disabled) { 
+            transform: translateY(-2px); 
+            box-shadow: 0 8px 25px rgba(204, 255, 0, 0.6);
+        }
+        .core-btn:disabled { 
+            opacity: 0.5; cursor: not-allowed;
+        }
+        .tg-btn { 
+            background: linear-gradient(135deg, #0088cc 0%, #005580 100%); 
+            color: #fff; font-weight: 900;
+            border: 1px solid rgba(255, 255, 255, 0.2); 
+            box-shadow: 0 5px 15px rgba(0, 136, 204, 0.4); 
+            transition: all 0.3s;
+        }
+        .tg-btn:hover:not(:disabled) { 
+            transform: translateY(-2px); 
+            box-shadow: 0 8px 25px rgba(0, 136, 204, 0.6);
+        }
+        .btn-water-blue { 
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.8) 0%, rgba(30, 64, 175, 0.9) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.2); 
+            color: #fff; 
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3); 
+            transition: all 0.3s;
+        }
+        .btn-water-red { 
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.8) 0%, rgba(153, 27, 27, 0.9) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.2); 
+            color: #fff; 
+            box-shadow: 0 5px 15px rgba(220, 38, 38, 0.3); 
+            transition: all 0.3s;
+        }
+        .anim-ascend { 
+            animation: ascendFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes ascendFade { 
+            0% { opacity: 0; transform: translateY(30px) scale(0.98); } 
+            100% { opacity: 1; transform: translateY(0) scale(1); } 
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
@@ -93,7 +187,6 @@
                 this.payloadCache = null;
                 this.tgUserId = null; 
                 this.otpConsumed = false;
-
                 this.ui = {
                     views: { login: document.getElementById('view-login'), builder: document.getElementById('view-builder'), results: document.getElementById('view-results') },
                     login: { user: document.getElementById('inp-username'), pass: document.getElementById('inp-password'), btn: document.getElementById('btn-login'), err: document.getElementById('msg-login-error') },
@@ -118,20 +211,20 @@
                 this.ui.builder.resetBtn.addEventListener('click', () => {
                     if (this.userRole === 'admin') this.switchView('builder');
                 });
-                
                 window.triggerAssetDownloadWrap = (type) => this.downloadAssetWrap(type);
                 window.sendToTelegramWrap = (btnElement, sendConf, sendQr, sendGuide) => this.pushToTelegramChatWrap(btnElement, sendConf, sendQr, sendGuide);
             }
 
             async handleLogin() {
-                const user = this.ui.login.user.value.trim(); const pass = this.ui.login.pass.value.trim();
+                const user = this.ui.login.user.value.trim();
+                const pass = this.ui.login.pass.value.trim();
                 if(!user || !pass) return;
                 this.ui.login.btn.querySelector('span').innerText = "VERIFYING..."; this.ui.login.btn.disabled = true; this.ui.login.err.classList.add('hidden');
                 try {
                     const res = await fetch(`${this.ENDPOINT}/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: user, password: pass }) });
                     const data = await res.json();
                     if(data.success) { 
-                        this.sessionToken = data.token; 
+                        this.sessionToken = data.token;
                         this.userRole = data.role; 
                         this.switchView('builder'); 
                         if (this.userRole === 'admin') {
@@ -140,15 +233,23 @@
                     } 
                     else throw new Error(data.error || "Login Failed");
                 } catch (e) { this.ui.login.err.innerText = e.message; this.ui.login.err.classList.remove('hidden'); } 
-                finally { this.ui.login.btn.querySelector('span').innerText = "AUTHENTICATE"; this.ui.login.btn.disabled = false; }
+                finally { this.ui.login.btn.querySelector('span').innerText = "AUTHENTICATE";
+                this.ui.login.btn.disabled = false; }
             }
 
             encodeBytesToBase64(uint8Array) { return btoa(String.fromCharCode.apply(null, uint8Array)); }
-            generateCryptoID() { return crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8); return v.toString(16); }); }
-            updateFeedback(msg, isError = false) { const el = this.ui.builder.status; el.textContent = msg; el.className = `text-xs font-bold block mt-4 ${isError ? 'text-red-500' : 'text-[#ccff00]'}`; el.classList.remove('hidden'); }
+            
+            generateCryptoID() { 
+                return crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8); return v.toString(16); });
+            }
+            
+            updateFeedback(msg, isError = false) { 
+                const el = this.ui.builder.status;
+                el.textContent = msg; el.className = `text-xs font-bold block mt-4 ${isError ? 'text-red-500' : 'text-[#ccff00]'}`; el.classList.remove('hidden');
+            }
             
             switchView(target) { 
-                Object.values(this.ui.views).forEach(v => v.classList.add('hidden')); 
+                Object.values(this.ui.views).forEach(v => v.classList.add('hidden'));
                 this.ui.views[target].classList.remove('hidden'); 
                 if (target === 'builder') {
                     this.ui.containers.output.innerHTML = '';
@@ -158,7 +259,7 @@
             }
 
             generateDocumentation(fileName) {
-                return `✅ <b>Config ဖန်တီးမှု အောင်မြင်ပါသည်!</b>\n\n================================\n🌟 <b>9Star VPN & Store × ZC.</b> 🌟\nPremium High-Speed VPN Guide\n================================\n\n❌ <b>[အလွန်အရေးကြီးသော သတိပေးချက် - မဖတ်မနေရ]</b> ❌\nသင့်အတွက် ယခုထုတ်ပေးထားသော Config ဖိုင် (<code>${fileName}.conf</code>) သည်\n<b>"Device တစ်ခုတည်းတွင်သာ အသုံးပြုရန် (1 Device Only)"</b> သတ်မှတ်ထားပါသည်။\n\n⚠️ ဖုန်းတစ်လုံးထက်ပို၍ဖြစ်စေ၊ ဖုန်းနှင့်ကွန်ပျူတာပြိုင်တူဖြစ်စေ ချိတ်ဆက်မိပါက\nCloudflare စနစ်မှ သင့် IP အား လုံးဝ Block ပြုလုပ်သွားမည်ဖြစ်ပြီး အင်တာနက်ချိတ်ဆက်မှု လုံးဝ ပြတ်တောက်သွားမည် ဖြစ်သည်။\n\n================================\n<b>[၁] လိုအပ်သော VPN Apps များ ဒေါင်းလုဒ်ရယူရန်</b>\n================================\n▶ <b>၁။ AmneziaWG VPN (အထူးအကြံပြုသည်)</b>\n- <a href="https://play.google.com/store/apps/details?id=org.amnezia.awg">Android (Google Play)</a>\n- <a href="https://apps.apple.com/us/app/amneziawg/id6478942365">iOS / Mac (App Store)</a>\n- <a href="https://github.com/amnezia-vpn/amneziawg-windows-client/releases/latest">Windows (PC Installer)</a>\n\n▶ <b>၂။ WireGuard VPN (ရွေးချယ်ရန်)</b>\n- <a href="https://play.google.com/store/apps/details?id=com.wireguard.android">Android (Google Play)</a>\n- <a href="https://apps.apple.com/us/app/wireguard/id1441195209">iOS / Mac (App Store)</a>\n- <a href="https://www.wireguard.com/install/">Windows (PC Build)</a>\n\n================================\n<b>[၂] အသုံးပြုနည်း အသေးစိတ် လမ်းညွှန်</b>\n================================\n<b>(က) .Conf ဖိုင်ဖြင့် ထည့်သွင်းနည်း (Import from file)</b>\n၁။ ပေးပို့ထားသော <code>${fileName}.conf</code> ဖိုင်ကို ဖုန်းထဲသို့ Save (ဒေါင်းလုဒ်) လုပ်ပါ။\n၂။ AmneziaWG (သို့မဟုတ်) WireGuard App ကိုဖွင့်ပါ။\n၃။ App ၏ ညာဘက်အောက်ထောင့် (+) ခလုတ်ကို နှိပ်ပါ။\n၄။ "Import from file or archive" ကိုရွေးချယ်ပြီး <code>${fileName}.conf</code> ဖိုင်ကို ရွေးပေးပါ။\n\n<b>(ခ) QR Code ဖြင့် Scan ဖတ်နည်း (Create from QR code)</b>\n၁။ ပေးပို့ထားသော QR ပုံကို အခြားဖုန်း သို့မဟုတ် ကွန်ပျူတာတွင် ဖွင့်ထားပါ။\n၂။ မိမိအသုံးပြုမည့် ဖုန်းရှိ VPN App ထဲသို့သွားကာ (+) ခလုတ်ကို နှိပ်ပါ။\n၃။ "Create from QR code" (သို့မဟုတ် Scan QR) ကို ရွေးချယ်ပြီး ကင်မရာဖြင့် ပုံကို Scan ဖတ်ပါ။\n\n💖 ဝယ်ယူအားပေးမှုအတွက် အထူးကျေးဇူးတင်ရှိပါသည်။ အသုံးပြုရာတွင် အခက်အခဲ သို့မဟုတ် အဆင်မပြေမှု တစ်စုံတစ်ရာ ရှိပါက @MrRaptor သို့မဟုတ် @ZayChoOnline သို့ အချိန်မရွေး ဆက်သွယ်မေးမြန်းနိုင်ပါသည်ခင်ဗျာ။`;
+                return `✅ <b>Config ဖန်တီးမှု အောင်မြင်ပါသည်!</b>\n\n================================\n🌟 <b>9Star VPN & Store × ZC.</b> 🌟\nPremium High-Speed VPN Guide\n================================\n\n❌ <b>[အလွန်အရေးကြီးသော သတိပေးချက် - မဖတ်မနေရ]</b> ❌\nသင့်အတွက် ယခုထုတ်ပေးထားသော Config ဖိုင် (<code>${fileName}.conf</code>) သည်\n<b>"Device တစ်ခုတည်းတွင်သာ အသုံးပြုရန် (1 Device Only)"</b> သတ်မှတ်ထားပါသည်။\n\n⚠️ ဖုန်းတစ်လုံးထက်ပို၍ဖြစ်စေ၊ ဖုန်းနှင့်ကွန်ပျူတာပြိုင်တူဖြစ်စေ ချိတ်ဆက်မိပါက\nCloudflare စနစ်မှ သင့် IP အား လုံးဝ Block ပြုလုပ်သွားမည်ဖြစ်ပြီး အင်တာနက်ချိတ်ဆက်မှု လုံးဝ ပြတ်တောက်သွားမည် ဖြစ်သည်။\n\n================================\n<b>[၁] လိုအပ်သော VPN Apps များ ဒေါင်းလုဒ်ရယူရန်</b>\n================================\n▶ <b>၁။ AmneziaWG VPN (အထူးအကြံပြုသည်)</b>\n- <a href="https://play.google.com/store/apps/details?id=org.amnezia.awg">Android (Google Play)</a>\n- <a href="https://apps.apple.com/us/app/amneziawg/id6478942365">iOS / Mac (App Store)</a>\n- <a href="https://github.com/amnezia-vpn/amneziawg-windows-client/releases/latest">Windows (PC Installer)</a>\n\n▶ <b>၂။ WireGuard VPN (ရွေးချယ်ရန်)</b>\n- <a href="https://play.google.com/store/apps/details?id=com.wireguard.android">Android (Google Play)</a>\n- <a href="https://apps.apple.com/us/app/wireguard/id1441195209">iOS / Mac (App Store)</a>\n- <a href="https://www.wireguard.com/install/">Windows (PC Build)</a>\n\n================================\n<b>[၂] အသုံးပြုနည်း အသေးစိတ် လမ်းညွှန်</b>\n================================\n<b>(က) .Conf ဖိုင်ဖြင့် ထည့်သွင်းနည်း (Import from file)</b>\n၁။ ပေးပို့ထားသော <code>${fileName}.conf</code> ဖိုင်ကို ဖုန်းထဲသို့ Save (ဒေါင်းလုဒ်) လုပ်ပါ။\n၂။ AmneziaWG (သို့မဟုတ်) WireGuard App ကိုဖွင့်ပါ။\n၃။ App ၏ ညာဘက်အောက်ထောင့် (+) ခလုတ်ကို နှိပ်ပါ။\n၄။ "Import from file or archive" ကိုရွေးချယ်ပြီး <code>${fileName}.conf</code> ဖိုင်ကို ရွေးပေးပါ။\n\n<b>(ခ) QR Code ဖြင့် Scan ဖတ်နည်း (Create from QR code)</b>\n၁။ ပေးပို့ထားသော QR ပုံကို အခြားဖုန်း သို့မဟုတ် ကွန်ပျူတာတွင် ဖွင့်ထားပါ။\n၂။ မိမိအသုံးပြုမည့် ဖုန်းရှိ VPN App ထဲသို့သွားကာ (+) ခလုတ်ကို နှိပ်ပါ။\n၃။ "Create from QR code" (သို့မဟုတ် Scan QR) ကို ရွေးချယ်ပြီး ကင်မရာဖြင့် ပုံကို Scan ဖတ်ပါ။\n\n================================\n<b>[၃] အာမခံနှင့် ဝန်ဆောင်မှု</b>\n================================\n📱 <b>ဖုန်းအသစ်ပြောင်းလဲခြင်း အစီအစဉ်</b>\nဝယ်ယူထားသော အာမခံကာလအတွင်း ဖုန်းပျက်ခြင်း၊ ဖုန်းအသစ်လဲခြင်းများ ကြုံတွေ့ရပါက Config အသစ် (၁) ကြိမ် အခမဲ့ (Free) ပြန်လည်ထုတ်ယူခွင့်ရှိပါသည်။ Admin သို့ အကြောင်းကြားပေးပါ။\n\n💖 ဝယ်ယူအားပေးမှုအတွက် အထူးကျေးဇူးတင်ရှိပါသည်။ အသုံးပြုရာတွင် အခက်အခဲ သို့မဟုတ် အဆင်မပြေမှု တစ်စုံတစ်ရာ ရှိပါက @MrRaptor သို့မဟုတ် @ZayChoOnline သို့ အချိန်မရွေး ဆက်သွယ်မေးမြန်းနိုင်ပါသည်ခင်ဗျာ။`;
             }
 
             async compilePayload() {
@@ -168,14 +269,14 @@
                     this.updateFeedback(`Authorizing & Connecting to Gateway...`);
                     const naclKeys = nacl.box.keyPair(); const pvt = this.encodeBytesToBase64(naclKeys.secretKey); const pub = this.encodeBytesToBase64(naclKeys.publicKey);
                     const requestBody = { key: pub, install_id: this.generateCryptoID(), fcm_token: `${this.generateCryptoID()}:APA91b${this.generateCryptoID()}`, tos: new Date().toISOString(), model: "AutoBuilder", locale: "en_US" };
-
                     const response = await fetch(`${this.ENDPOINT}/api/generate`, { method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${this.sessionToken}` }, body: JSON.stringify(requestBody) });
                     const resData = await response.json();
+                    
                     if (!response.ok || resData.success === false) throw new Error(resData.error || `Rejected: ${response.status}`);
-
+                    
                     const finalTitle = rawName === "" ? "WARP_" + (Math.floor(Math.random() * 9000) + 1000) : rawName;
                     const pureConfText = `[Interface]\nPrivateKey = ${pvt}\nAddress = ${resData.config.interface.addresses.v4}/32, ${resData.config.interface.addresses.v6}/128\nDNS = 1.1.1.1, 1.0.0.1\nMTU = 1280\n\n[Peer]\nPublicKey = ${resData.config.peers[0].public_key}\nAllowedIPs = 0.0.0.0/0, ::/0\nEndpoint = 162.159.192.1:500`;
-
+                    
                     this.ui.containers.qrBuffer.innerHTML = ""; 
                     new QRCode(this.ui.containers.qrBuffer, { 
                         text: pureConfText, 
@@ -190,7 +291,7 @@
                     
                     const cvs = document.createElement("canvas"); 
                     cvs.width = 250; cvs.height = 270; 
-                    const ctx = cvs.getContext("2d"); 
+                    const ctx = cvs.getContext("2d");
                     ctx.fillStyle = "#ffffff"; 
                     ctx.fillRect(0, 0, 250, 270); 
                     ctx.drawImage(this.ui.containers.qrBuffer.querySelector("canvas"), 15, 15);
@@ -202,12 +303,13 @@
 
                     const extractedQR = cvs.toDataURL("image/png").split(',')[1];
                     const docText = this.generateDocumentation(finalTitle);
-
+                    
                     this.payloadCache = { fileName: finalTitle, dataConf: pureConfText, imgCode: extractedQR, guideTxt: docText };
 
                     this.drawOutputCard(); this.switchView('results');
                 } catch (ex) { this.updateFeedback('❌ ' + ex.message, true); } 
-                finally { this.ui.builder.buildBtn.disabled = false; this.ui.builder.lblBtn.innerText = "Build Configuration"; }
+                finally { this.ui.builder.buildBtn.disabled = false;
+                this.ui.builder.lblBtn.innerText = "Build Configuration"; }
             }
 
             drawOutputCard() {
@@ -312,7 +414,7 @@
             }
 
             async consumeOTPSecurely() {
-                if (this.userRole === 'admin') return true; 
+                if (this.userRole === 'admin') return true;
                 if (this.otpConsumed) return true; 
 
                 try {
@@ -321,11 +423,16 @@
                     });
                     const data = await res.json();
                     if (data.success) {
-                        this.otpConsumed = true; return true;
+                        this.otpConsumed = true;
+                        return true;
                     } else {
-                        alert("Error: " + (data.error || "OTP သက်တမ်းကုန်ဆုံးသွားပါပြီ။")); return false;
+                        alert("Error: " + (data.error || "OTP သက်တမ်းကုန်ဆုံးသွားပါပြီ။"));
+                        return false;
                     }
-                } catch (e) { alert("Network error. ကျေးဇူးပြု၍ ပြန်လည်ကြိုးစားပါ။"); return false; }
+                } catch (e) { 
+                    alert("Network error. ကျေးဇူးပြု၍ ပြန်လည်ကြိုးစားပါ။");
+                    return false; 
+                }
             }
 
             async pushToTelegramChatWrap(btnElement, sendConf = true, sendQr = true, sendGuide = true) {
@@ -334,7 +441,11 @@
                 btnElement.innerHTML = `<span>⏳ ပို့ဆောင်နေပါသည်...</span>`;
                 
                 const canProceed = await this.consumeOTPSecurely();
-                if (!canProceed) { btnElement.disabled = false; btnElement.innerHTML = originalText; return; }
+                if (!canProceed) { 
+                    btnElement.disabled = false;
+                    btnElement.innerHTML = originalText; 
+                    return; 
+                }
 
                 try {
                     const payload = { 
@@ -355,7 +466,10 @@
                             setTimeout(() => { if (window.Telegram && window.Telegram.WebApp) window.Telegram.WebApp.close(); }, 2500);
                         }
                     } else throw new Error("Failed");
-                } catch (err) { btnElement.disabled = false; btnElement.innerHTML = `<span>❌ ပြန်လည်ကြိုးစားပါ</span>`; }
+                } catch (err) { 
+                    btnElement.disabled = false; 
+                    btnElement.innerHTML = `<span>❌ ပြန်လည်ကြိုးစားပါ</span>`;
+                }
             }
 
             async downloadAssetWrap(type) {
@@ -364,12 +478,21 @@
             }
 
             downloadAsset(type) {
-                const blobTarget = this.payloadCache; const anchor = document.createElement("a");
+                const blobTarget = this.payloadCache;
+                const anchor = document.createElement("a");
                 switch(type) {
-                    case 'conf': anchor.href = URL.createObjectURL(new Blob([blobTarget.dataConf], { type: 'application/x-wireguard-profile' })); anchor.download = `${blobTarget.fileName}.conf`; break;
-                    case 'qr': anchor.href = "data:image/png;base64," + blobTarget.imgCode; anchor.download = `${blobTarget.fileName}_QR.png`; break;
+                    case 'conf': 
+                        anchor.href = URL.createObjectURL(new Blob([blobTarget.dataConf], { type: 'application/x-wireguard-profile' }));
+                        anchor.download = `${blobTarget.fileName}.conf`; 
+                        break;
+                    case 'qr': 
+                        anchor.href = "data:image/png;base64," + blobTarget.imgCode; 
+                        anchor.download = `${blobTarget.fileName}_QR.png`; 
+                        break;
                 }
-                document.body.appendChild(anchor); anchor.click(); document.body.removeChild(anchor);
+                document.body.appendChild(anchor); 
+                anchor.click(); 
+                document.body.removeChild(anchor);
             }
         }
         document.addEventListener('DOMContentLoaded', () => new VPNConfigArchitect());
