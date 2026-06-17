@@ -4,498 +4,493 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>9Star VPN & Store × ZC.</title>
+    
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tweetnacl@1.0.3/nacl.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;900&family=Teko:wght@500;600;700&display=swap" rel="stylesheet">
+    
     <style>
         :root { 
-            --primary-neon: #ccff00;
-            --primary-glow: rgba(204, 255, 0, 0.4); 
-            --accent-danger: #dc2626; 
-            --danger-glow: rgba(220, 38, 38, 0.4); 
-            --base-bg: #0a0a0c;
+            --accent-green: #ccff00; --accent-glow-green: rgba(204, 255, 0, 0.4); 
+            --accent-red: #dc2626; --accent-glow-red: rgba(220, 38, 38, 0.4); 
+            --bg-base: #0a0a0c;
         }
-        body { 
-            background-color: var(--base-bg); 
-            color: #ffffff; 
-            font-family: 'Montserrat', sans-serif; 
-            overflow-x: hidden;
-        }
-        .map-overlay { 
-            position: fixed; 
-            top: -15vh; left: -5vw; 
-            width: 110vw; height: 130vh;
-            z-index: -2; 
-            background-color: var(--primary-neon); 
-            -webkit-mask-image: url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_map_blank_without_borders.svg'); 
-            mask-image: url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_map_blank_without_borders.svg'); 
-            -webkit-mask-size: cover; mask-size: cover; 
-            opacity: 0.08;
-        }
-        .backdrop-glow-layer { 
-            position: fixed; 
-            top: -10vh; left: 0; 
-            width: 100vw; height: 120vh;
-            z-index: -1; 
-            background: radial-gradient(circle at 15% 20%, rgba(220, 38, 38, 0.15) 0%, transparent 40%), 
-                        radial-gradient(circle at 85% 80%, rgba(204, 255, 0, 0.05) 0%, transparent 40%);
-            pointer-events: none; 
-        }
-        .txt-brand-danger { 
-            font-family: 'Teko', sans-serif; 
-            color: var(--accent-danger);
-            text-shadow: 0 0 15px var(--danger-glow); 
-            letter-spacing: 1px; 
-        }
-        .txt-brand-neon { 
-            font-family: 'Montserrat', sans-serif;
-            color: var(--primary-neon); 
-            text-shadow: 0 0 15px var(--primary-glow); 
-            font-weight: 900; 
-        }
-        .acrylic-card { 
-            background: linear-gradient(145deg, rgba(30, 30, 35, 0.45) 0%, rgba(10, 10, 15, 0.65) 100%);
-            backdrop-filter: blur(24px); 
-            border-top: 1px solid rgba(255, 255, 255, 0.15); 
-            border-left: 1px solid rgba(255, 255, 255, 0.05); 
-            border-radius: 28px;
-            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-        }
-        .lux-input { 
-            background: rgba(0, 0, 0, 0.4); 
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.05); 
-            box-shadow: inset 0 3px 6px rgba(0,0,0,0.6); 
-            transition: all 0.4s;
-        }
-        .lux-input:focus { 
-            background: rgba(204, 255, 0, 0.03); 
-            border-color: rgba(204, 255, 0, 0.4);
-            outline: none; 
-        }
-        .core-btn { 
-            background: linear-gradient(135deg, rgba(204, 255, 0, 0.9) 0%, rgba(153, 204, 0, 0.9) 100%);
-            color: #000; 
-            font-weight: 900; 
-            border: 1px solid rgba(255, 255, 255, 0.4); 
-            box-shadow: 0 5px 15px var(--primary-glow); 
-            transition: all 0.3s;
-        }
-        .core-btn:hover:not(:disabled) { 
-            transform: translateY(-2px); 
-            box-shadow: 0 8px 25px rgba(204, 255, 0, 0.6);
-        }
-        .core-btn:disabled { 
-            opacity: 0.5; cursor: not-allowed;
-        }
-        .tg-btn { 
-            background: linear-gradient(135deg, #0088cc 0%, #005580 100%); 
-            color: #fff; font-weight: 900;
-            border: 1px solid rgba(255, 255, 255, 0.2); 
-            box-shadow: 0 5px 15px rgba(0, 136, 204, 0.4); 
-            transition: all 0.3s;
-        }
-        .tg-btn:hover:not(:disabled) { 
-            transform: translateY(-2px); 
-            box-shadow: 0 8px 25px rgba(0, 136, 204, 0.6);
-        }
-        .btn-water-blue { 
-            background: linear-gradient(135deg, rgba(37, 99, 235, 0.8) 0%, rgba(30, 64, 175, 0.9) 100%);
-            border: 1px solid rgba(255, 255, 255, 0.2); 
-            color: #fff; 
-            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3); 
-            transition: all 0.3s;
-        }
-        .btn-water-red { 
-            background: linear-gradient(135deg, rgba(220, 38, 38, 0.8) 0%, rgba(153, 27, 27, 0.9) 100%);
-            border: 1px solid rgba(255, 255, 255, 0.2); 
-            color: #fff; 
-            box-shadow: 0 5px 15px rgba(220, 38, 38, 0.3); 
-            transition: all 0.3s;
-        }
-        .anim-ascend { 
-            animation: ascendFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-        @keyframes ascendFade { 
-            0% { opacity: 0; transform: translateY(30px) scale(0.98); } 
-            100% { opacity: 1; transform: translateY(0) scale(1); } 
-        }
+        body { background-color: var(--bg-base); color: #fff; font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
+        
+        /* Background Effects */
+        .bg-layer-map { position: fixed; top: -15vh; left: -5vw; width: 110vw; height: 130vh; z-index: -2; background-color: var(--accent-green); -webkit-mask-image: url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_map_blank_without_borders.svg'); mask-image: url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_map_blank_without_borders.svg'); -webkit-mask-size: cover; mask-size: cover; opacity: 0.08; }
+        .bg-layer-glow { position: fixed; top: -10vh; left: 0; width: 100vw; height: 120vh; z-index: -1; background: radial-gradient(circle at 15% 20%, rgba(220, 38, 38, 0.15) 0%, transparent 40%), radial-gradient(circle at 85% 80%, rgba(204, 255, 0, 0.05) 0%, transparent 40%); pointer-events: none; }
+        
+        /* Typography */
+        .font-primary-brand { font-family: 'Teko', sans-serif; color: var(--accent-red); text-shadow: 0 0 15px var(--accent-glow-red); letter-spacing: 1px; }
+        .font-secondary-brand { font-family: 'Montserrat', sans-serif; color: var(--accent-green); text-shadow: 0 0 15px var(--accent-glow-green); font-weight: 900; }
+        
+        /* Components */
+        .ui-card { background: linear-gradient(145deg, rgba(30, 30, 35, 0.45) 0%, rgba(10, 10, 15, 0.65) 100%); backdrop-filter: blur(24px); border-top: 1px solid rgba(255, 255, 255, 0.15); border-left: 1px solid rgba(255, 255, 255, 0.05); border-radius: 28px; box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1); }
+        
+        .otp-input { width: clamp(24px, 8vw, 42px); height: clamp(36px, 11vw, 54px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; text-align: center; font-size: clamp(1.1rem, 4vw, 1.4rem); font-weight: 700; color: var(--accent-green); background: rgba(0, 0, 0, 0.4); box-shadow: inset 0 2px 5px rgba(0,0,0,0.6); transition: all 0.3s ease; }
+        .otp-input:focus { border-color: var(--accent-green); box-shadow: 0 0 10px rgba(204, 255, 0, 0.25), inset 0 2px 5px rgba(0,0,0,0.6); outline: none; background: rgba(204, 255, 0, 0.05); }
+        
+        .text-field { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: inset 0 3px 6px rgba(0,0,0,0.6); transition: all 0.4s; }
+        .text-field:focus { background: rgba(204, 255, 0, 0.03); border-color: rgba(204, 255, 0, 0.4); outline: none; }
+        
+        /* Buttons */
+        .btn-primary { background: linear-gradient(135deg, rgba(204, 255, 0, 0.9) 0%, rgba(153, 204, 0, 0.9) 100%); color: #000; font-weight: 900; border: 1px solid rgba(255, 255, 255, 0.4); box-shadow: 0 5px 15px var(--accent-glow-green); transition: all 0.3s; }
+        .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(204, 255, 0, 0.6); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .btn-tg { background: linear-gradient(135deg, #0088cc 0%, #005580 100%); color: #fff; font-weight: 900; border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 5px 15px rgba(0, 136, 204, 0.4); transition: all 0.3s; }
+        .btn-blue { background: linear-gradient(135deg, rgba(37, 99, 235, 0.8) 0%, rgba(30, 64, 175, 0.9) 100%); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3); transition: all 0.3s; }
+        .btn-red { background: linear-gradient(135deg, rgba(220, 38, 38, 0.8) 0%, rgba(153, 27, 27, 0.9) 100%); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; box-shadow: 0 5px 15px rgba(220, 38, 38, 0.3); transition: all 0.3s; }
+        
+        /* Animations */
+        .anim-fade-up { animation: fadeUpAnim 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes fadeUpAnim { 0% { opacity: 0; transform: translateY(30px) scale(0.98); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+
+        /* Scrollbar */
+        .scroll-custom::-webkit-scrollbar { width: 5px; }
+        .scroll-custom::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); border-radius: 10px; }
+        .scroll-custom::-webkit-scrollbar-thumb { background: rgba(204,255,0,0.4); border-radius: 10px; }
+        .scroll-custom::-webkit-scrollbar-thumb:hover { background: rgba(204,255,0,0.7); }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-4">
+<body class="min-h-screen flex flex-col items-center justify-center p-4 gap-4 md:gap-6">
 
-    <div class="map-overlay"></div>
-    <div class="backdrop-glow-layer"></div>
+    <div class="bg-layer-map"></div>
+    <div class="bg-layer-glow"></div>
 
-    <header class="w-full max-w-2xl text-center mb-6 anim-ascend">
+    <header class="w-full max-w-2xl text-center anim-fade-up">
         <div class="flex flex-col items-center justify-center gap-1">
-            <div class="flex flex-wrap items-center justify-center gap-2 md:gap-3">
-                <h1 class="txt-brand-danger text-2xl md:text-3xl mt-2">9Star VPN & Store</h1>
-                <span class="text-gray-500 text-xl font-light pb-1">×</span>
-                <h1 class="txt-brand-neon text-2xl md:text-3xl">ZC.</h1>
+            <div class="flex flex-wrap items-center justify-center gap-3 md:gap-4">
+                <h1 class="font-primary-brand text-4xl md:text-5xl lg:text-6xl mt-2 drop-shadow-[0_0_15px_rgba(220,38,38,0.6)]">9Star VPN & Store</h1>
+                <span class="text-gray-400 text-3xl md:text-4xl font-light pb-1">×</span>
+                <h1 class="font-secondary-brand text-4xl md:text-5xl lg:text-6xl drop-shadow-[0_0_15px_rgba(204,255,0,0.6)]">ZC.</h1>
             </div>
         </div>
     </header>
 
-    <main class="w-full max-w-lg relative z-10 flex-grow flex flex-col justify-center">
-        <section id="view-login" class="acrylic-card p-6 text-center w-full max-w-sm mx-auto anim-ascend">
+    <main class="w-full max-w-lg relative z-10 flex flex-col items-center">
+        <section id="view-auth" class="ui-card p-6 sm:p-8 text-center w-full max-w-[420px] mx-auto anim-fade-up">
             <div class="mb-6">
-                <h2 class="text-white font-bold text-lg tracking-wider">SECURE ACCESS</h2>
-                <p class="text-xs text-gray-400 mt-1">Enter your Admin or Telegram OTP details.</p>
+                <h2 class="text-white font-bold text-lg md:text-xl tracking-widest uppercase">Secure Access</h2>
+                <p class="text-xs md:text-sm text-gray-400 mt-1">Enter your 10-digit Access Code</p>
             </div>
-            <div class="space-y-4 mb-6">
-                <input type="text" id="inp-username" placeholder="Username" class="w-full lux-input rounded-2xl px-4 py-3.5 text-sm text-white text-center font-medium">
-                <input type="password" id="inp-password" placeholder="Password" class="w-full lux-input rounded-2xl px-4 py-3.5 text-sm text-white text-center font-medium">
+            
+            <div class="flex justify-center items-center gap-1.5 mb-8 w-full">
+                <div class="flex gap-1" id="otp-group-1">
+                    <input type="text" maxlength="1" class="otp-input uppercase" autocomplete="off">
+                    <input type="text" maxlength="1" class="otp-input uppercase" autocomplete="off">
+                    <input type="text" maxlength="1" class="otp-input uppercase" autocomplete="off">
+                    <input type="text" maxlength="1" class="otp-input uppercase" autocomplete="off">
+                    <input type="text" maxlength="1" class="otp-input uppercase" autocomplete="off">
+                </div>
+                <span class="text-gray-500 font-bold mx-0.5 md:mx-1">-</span>
+                <div class="flex gap-1" id="otp-group-2">
+                    <input type="text" maxlength="1" class="otp-input uppercase" autocomplete="off">
+                    <input type="text" maxlength="1" class="otp-input uppercase" autocomplete="off">
+                    <input type="text" maxlength="1" class="otp-input uppercase" autocomplete="off">
+                    <input type="text" maxlength="1" class="otp-input uppercase" autocomplete="off">
+                    <input type="text" maxlength="1" class="otp-input uppercase" autocomplete="off">
+                </div>
             </div>
-            <button id="btn-login" class="core-btn w-full py-4 rounded-2xl font-bold uppercase tracking-widest text-xs relative">
-                <span>AUTHENTICATE</span>
+
+            <div class="flex items-center justify-center gap-2 mb-6 px-1">
+                <input type="checkbox" id="policy-agree" class="w-[16px] h-[16px] rounded border-gray-600 bg-black/50 text-[#ccff00] focus:ring-[#ccff00] focus:ring-offset-gray-900 cursor-pointer">
+                <label for="policy-agree" class="text-gray-400 text-[12px] md:text-[13px] cursor-pointer">I accept the <a href="#" id="policy-link" class="text-[#ccff00] hover:underline">Terms of Service</a></label>
+            </div>
+
+            <button id="trigger-auth" class="w-full btn-primary py-3.5 rounded-2xl text-[13px] md:text-[14px] uppercase tracking-widest font-bold flex justify-center items-center">
+                <span>Authenticate</span>
             </button>
-            <p id="msg-login-error" class="text-xs font-bold text-red-500 mt-4 hidden tracking-wide text-center"></p>
+            <p id="msg-auth-err" class="text-xs font-bold text-red-500 mt-4 hidden tracking-wide text-center"></p>
         </section>
 
-        <section id="view-builder" class="hidden acrylic-card p-6 text-center w-full max-w-sm mx-auto anim-ascend">
+        <section id="view-build" class="hidden ui-card p-6 text-center w-full max-w-sm mx-auto anim-fade-up">
             <div class="space-y-4 mb-6">
-                <input type="text" id="inp-profile-name" placeholder="Custom Profile Name (Optional)" class="w-full lux-input rounded-2xl px-4 py-3.5 text-sm text-white text-center font-medium">
+                <input type="text" id="cfg-name-input" placeholder="Custom Profile Name (Optional)" class="w-full text-field rounded-2xl px-4 py-3.5 text-sm text-white text-center font-medium">
             </div>
-            <button id="btn-execute-build" class="core-btn w-full py-4 rounded-2xl flex flex-col items-center gap-1 uppercase tracking-widest text-xs">
-                <div id="icon-idle">⚡</div>
-                <span id="lbl-btn-status">Build Configuration</span>
+            <button id="trigger-build" class="btn-primary w-full py-4 rounded-2xl flex flex-col items-center gap-1 uppercase tracking-widest text-xs">
+                <div>⚡</div>
+                <span id="trigger-build-txt">Build Configuration</span>
             </button>
             <p id="msg-build-status" class="text-xs font-bold hidden mt-4 tracking-wide text-center"></p>
         </section>
 
-        <section id="view-results" class="hidden anim-ascend w-full max-w-lg mx-auto">
+        <section id="view-final" class="hidden anim-fade-up w-full max-w-lg mx-auto">
             <div class="flex justify-center mb-4">
-                <button id="btn-create-another" class="hidden ghost-btn text-gray-400 hover:text-[#ccff00] text-xs font-bold uppercase py-2 px-6 rounded-full border border-gray-600">
+                <button id="trigger-reset" class="hidden text-gray-400 hover:text-[#ccff00] text-xs font-bold uppercase py-2 px-6 rounded-full border border-gray-600">
                     ➕ Build Another Profile
                 </button>
             </div>
-            <div id="render-target-configs" class="space-y-6"></div>
+            <div id="wrapper-output" class="space-y-6"></div>
         </section>
         
-        <div id="canvas-vault-hidden" class="hidden"></div>
+        <div id="render-canvas-qr" class="hidden"></div>
     </main>
 
+    <div id="modal-tos" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm anim-fade-up">
+        <div class="ui-card p-6 w-full max-w-md max-h-[85vh] flex flex-col relative border border-[#ccff00]/20 shadow-[0_0_30px_rgba(204,255,0,0.15)]">
+            <h3 class="text-[#ccff00] font-bold text-lg md:text-xl mb-4 tracking-wider uppercase border-b border-white/10 pb-3">Terms of Service</h3>
+            
+            <div class="overflow-y-auto pr-3 text-[12px] md:text-[13px] text-gray-300 space-y-4 flex-grow scroll-custom leading-relaxed text-left">
+                <p>၁။ ဤ VPN ဝန်ဆောင်မှုသည် တစ်ကိုယ်ရည်လုံခြုံမှုနှင့် လွတ်လပ်စွာ အင်တာနက်အသုံးပြုနိုင်ရန် ရည်ရွယ်ပါသည်။</p>
+                <div class="bg-red-500/10 border border-red-500/20 p-3 rounded-xl text-red-200">
+                    <p class="text-red-400 font-bold mb-1">၂။ ⚠️ 1 Device Only (အရေးကြီး):</p>
+                    <p>ထုတ်ပေးထားသော Config ဖိုင်ကို ဖုန်း သို့မဟုတ် ကွန်ပျူတာ တစ်လုံးတည်းတွင်သာ အသုံးပြုရပါမည်။ ဖုန်းတစ်လုံးထက်ပို၍ဖြစ်စေ၊ ကွန်ပျူတာဖြင့် ပြိုင်တူချိတ်ဆက်ပါက Cloudflare စနစ်မှ အလိုအလျောက် ပိတ်ပင်မည် (Block) ဖြစ်ပြီး လိုင်းလုံးဝ ပြတ်တောက်သွားမည်ဖြစ်ပါသည်။</p>
+                </div>
+                <p>၃။ <b>အာမခံအစီအစဉ်:</b> ဝယ်ယူထားသော အာမခံကာလအတွင်း ဖုန်းပျက်ခြင်း၊ ဖုန်းအသစ်လဲခြင်းများ ကြုံတွေ့ရပါက Customer များအတွက် အထူးအစီအစဉ်အနေဖြင့် Config အသစ် (၁) ကြိမ် အခမဲ့ (Free) ပြန်လည်ထုတ်ယူခွင့်ပေးထားပါသည်။</p>
+                <p>၄။ တရားမဝင်သော လုပ်ငန်းများ၊ Spam ပို့ခြင်း၊ Hacking ပြုလုပ်ခြင်းများအတွက် အသုံးပြုခြင်းကို လုံးဝ တားမြစ်ထားပါသည်။</p>
+                <p class="text-gray-500 italic mt-2">* အထက်ပါစည်းကမ်းချက်များကို ဖောက်ဖျက်ပါက ဝန်ဆောင်မှုကို ကြိုတင်အကြောင်းကြားခြင်းမရှိဘဲ ရပ်ဆိုင်းပိုင်ခွင့်ရှိသည်။ ငွေပေးချေပြီး Code ထုတ်ယူပြီးပါက ဤစည်းကမ်းချက်များကို သဘောတူပြီးဖြစ်သည်ဟု မှတ်ယူပါမည်။</p>
+            </div>
+            
+            <button id="trigger-close-tos" class="mt-5 w-full py-3.5 btn-primary rounded-xl text-[13px] uppercase tracking-widest font-bold">
+                I Understand
+            </button>
+        </div>
+    </div>
+
     <script>
-        class VPNConfigArchitect {
+        const ENDPOINT = "https://curly-bonus-7ec5.zaychox9star.workers.dev";
+
+        class VpnStoreApp {
             constructor() {
-                this.ENDPOINT = "https://curly-bonus-7ec5.zaychox9star.workers.dev";
-                this.sessionToken = null;
-                this.userRole = null; 
-                this.payloadCache = null;
-                this.tgUserId = null; 
-                this.otpConsumed = false;
-                this.ui = {
-                    views: { login: document.getElementById('view-login'), builder: document.getElementById('view-builder'), results: document.getElementById('view-results') },
-                    login: { user: document.getElementById('inp-username'), pass: document.getElementById('inp-password'), btn: document.getElementById('btn-login'), err: document.getElementById('msg-login-error') },
-                    builder: { name: document.getElementById('inp-profile-name'), buildBtn: document.getElementById('btn-execute-build'), status: document.getElementById('msg-build-status'), lblBtn: document.getElementById('lbl-btn-status'), resetBtn: document.getElementById('btn-create-another') },
-                    containers: { output: document.getElementById('render-target-configs'), qrBuffer: document.getElementById('canvas-vault-hidden') }
+                this.session = { jwt: null, scope: null, tgUser: null, isSpent: false, localData: null };
+                
+                this.dom = {
+                    views: { auth: document.getElementById('view-auth'), build: document.getElementById('view-build'), finish: document.getElementById('view-final') },
+                    auth: { btn: document.getElementById('trigger-auth'), error: document.getElementById('msg-auth-err'), checkbox: document.getElementById('policy-agree'), inputs: document.querySelectorAll('.otp-input') },
+                    build: { input: document.getElementById('cfg-name-input'), btn: document.getElementById('trigger-build'), status: document.getElementById('msg-build-status'), btnText: document.getElementById('trigger-build-txt'), reset: document.getElementById('trigger-reset') },
+                    finish: { container: document.getElementById('wrapper-output'), qrDiv: document.getElementById('render-canvas-qr') },
+                    modal: { box: document.getElementById('modal-tos'), link: document.getElementById('policy-link'), close: document.getElementById('trigger-close-tos') }
                 };
-                this.initTelegram();
-                this.bootstrap();
+
+                this.initialize();
             }
 
-            initTelegram() {
-                if (window.Telegram && window.Telegram.WebApp) {
+            initialize() {
+                this.checkTgEnvironment();
+                this.registerListeners();
+                this.initOtpBehavior();
+                this.exposeWindowGlobals();
+            }
+
+            checkTgEnvironment() {
+                if (window.Telegram?.WebApp) {
                     window.Telegram.WebApp.expand();
-                    const initData = window.Telegram.WebApp.initDataUnsafe;
-                    if (initData && initData.user) this.tgUserId = initData.user.id;
+                    this.session.tgUser = window.Telegram.WebApp.initDataUnsafe?.user?.id || null;
                 }
             }
 
-            bootstrap() {
-                this.ui.login.btn.addEventListener('click', () => this.handleLogin());
-                this.ui.builder.buildBtn.addEventListener('click', () => this.compilePayload());
-                this.ui.builder.resetBtn.addEventListener('click', () => {
-                    if (this.userRole === 'admin') this.switchView('builder');
-                });
-                window.triggerAssetDownloadWrap = (type) => this.downloadAssetWrap(type);
-                window.sendToTelegramWrap = (btnElement, sendConf, sendQr, sendGuide) => this.pushToTelegramChatWrap(btnElement, sendConf, sendQr, sendGuide);
+            registerListeners() {
+                this.dom.auth.btn.addEventListener('click', () => this.handleAuthentication());
+                this.dom.build.btn.addEventListener('click', () => this.handleVpnGeneration());
+                this.dom.build.reset.addEventListener('click', () => { if (this.session.scope === 'admin') this.switchView('build'); });
+
+                // Modal Event Handlers
+                this.dom.modal.link.addEventListener('click', (e) => { e.preventDefault(); this.dom.modal.box.classList.remove('hidden'); });
+                this.dom.modal.close.addEventListener('click', () => this.dom.modal.box.classList.add('hidden'));
+                this.dom.modal.box.addEventListener('click', (e) => { if (e.target === this.dom.modal.box) this.dom.modal.box.classList.add('hidden'); });
             }
 
-            async handleLogin() {
-                const user = this.ui.login.user.value.trim();
-                const pass = this.ui.login.pass.value.trim();
-                if(!user || !pass) return;
-                this.ui.login.btn.querySelector('span').innerText = "VERIFYING..."; this.ui.login.btn.disabled = true; this.ui.login.err.classList.add('hidden');
-                try {
-                    const res = await fetch(`${this.ENDPOINT}/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: user, password: pass }) });
-                    const data = await res.json();
-                    if(data.success) { 
-                        this.sessionToken = data.token;
-                        this.userRole = data.role; 
-                        this.switchView('builder'); 
-                        if (this.userRole === 'admin') {
-                            this.ui.builder.resetBtn.classList.remove('hidden');
+            initOtpBehavior() {
+                const fields = Array.from(this.dom.auth.inputs);
+                fields.forEach((field, index) => {
+                    field.addEventListener('input', () => {
+                        field.value = field.value.toUpperCase();
+                        if (field.value && index < fields.length - 1) fields[index + 1].focus();
+                    });
+                    field.addEventListener('keydown', (e) => {
+                        if (e.key === 'Backspace' && !field.value && index > 0) fields[index - 1].focus();
+                    });
+                    field.addEventListener('paste', (e) => {
+                        e.preventDefault();
+                        const chars = e.clipboardData.getData('text').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+                        let focusIndex = index;
+                        for (let char of chars) {
+                            if (focusIndex >= fields.length) break;
+                            fields[focusIndex].value = char;
+                            focusIndex++;
                         }
-                    } 
-                    else throw new Error(data.error || "Login Failed");
-                } catch (e) { this.ui.login.err.innerText = e.message; this.ui.login.err.classList.remove('hidden'); } 
-                finally { this.ui.login.btn.querySelector('span').innerText = "AUTHENTICATE";
-                this.ui.login.btn.disabled = false; }
+                        fields[Math.min(focusIndex, fields.length - 1)].focus();
+                    });
+                });
             }
 
-            encodeBytesToBase64(uint8Array) { return btoa(String.fromCharCode.apply(null, uint8Array)); }
-            
-            generateCryptoID() { 
-                return crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8); return v.toString(16); });
+            exposeWindowGlobals() {
+                window.actionDownload = async (format) => {
+                    if (await this.processTokenUsage()) this.downloadLocalAsset(format);
+                };
+                window.actionSendTg = async (btnObj, wConf, wQr, wGuide) => {
+                    await this.pushPayloadToTg(btnObj, wConf, wQr, wGuide);
+                };
             }
-            
-            updateFeedback(msg, isError = false) { 
-                const el = this.ui.builder.status;
-                el.textContent = msg; el.className = `text-xs font-bold block mt-4 ${isError ? 'text-red-500' : 'text-[#ccff00]'}`; el.classList.remove('hidden');
-            }
-            
-            switchView(target) { 
-                Object.values(this.ui.views).forEach(v => v.classList.add('hidden'));
-                this.ui.views[target].classList.remove('hidden'); 
-                if (target === 'builder') {
-                    this.ui.containers.output.innerHTML = '';
-                    this.ui.builder.status.classList.add('hidden');
-                    this.ui.builder.name.value = '';
+
+            switchView(viewName) {
+                Object.values(this.dom.views).forEach(v => v.classList.add('hidden'));
+                this.dom.views[viewName].classList.remove('hidden');
+                
+                if (viewName === 'build') {
+                    this.dom.finish.container.innerHTML = '';
+                    this.dom.build.status.classList.add('hidden');
+                    this.dom.build.input.value = '';
                 }
             }
 
-            generateDocumentation(fileName) {
-                return `✅ <b>Config ဖန်တီးမှု အောင်မြင်ပါသည်!</b>\n\n================================\n🌟 <b>9Star VPN & Store × ZC.</b> 🌟\nPremium High-Speed VPN Guide\n================================\n\n❌ <b>[အလွန်အရေးကြီးသော သတိပေးချက် - မဖတ်မနေရ]</b> ❌\nသင့်အတွက် ယခုထုတ်ပေးထားသော Config ဖိုင် (<code>${fileName}.conf</code>) သည်\n<b>"Device တစ်ခုတည်းတွင်သာ အသုံးပြုရန် (1 Device Only)"</b> သတ်မှတ်ထားပါသည်။\n\n⚠️ ဖုန်းတစ်လုံးထက်ပို၍ဖြစ်စေ၊ ဖုန်းနှင့်ကွန်ပျူတာပြိုင်တူဖြစ်စေ ချိတ်ဆက်မိပါက\nCloudflare စနစ်မှ သင့် IP အား လုံးဝ Block ပြုလုပ်သွားမည်ဖြစ်ပြီး အင်တာနက်ချိတ်ဆက်မှု လုံးဝ ပြတ်တောက်သွားမည် ဖြစ်သည်။\n\n================================\n<b>[၁] လိုအပ်သော VPN Apps များ ဒေါင်းလုဒ်ရယူရန်</b>\n================================\n▶ <b>၁။ AmneziaWG VPN (အထူးအကြံပြုသည်)</b>\n- <a href="https://play.google.com/store/apps/details?id=org.amnezia.awg">Android (Google Play)</a>\n- <a href="https://apps.apple.com/us/app/amneziawg/id6478942365">iOS / Mac (App Store)</a>\n- <a href="https://github.com/amnezia-vpn/amneziawg-windows-client/releases/latest">Windows (PC Installer)</a>\n\n▶ <b>၂။ WireGuard VPN (ရွေးချယ်ရန်)</b>\n- <a href="https://play.google.com/store/apps/details?id=com.wireguard.android">Android (Google Play)</a>\n- <a href="https://apps.apple.com/us/app/wireguard/id1441195209">iOS / Mac (App Store)</a>\n- <a href="https://www.wireguard.com/install/">Windows (PC Build)</a>\n\n================================\n<b>[၂] အသုံးပြုနည်း အသေးစိတ် လမ်းညွှန်</b>\n================================\n<b>(က) .Conf ဖိုင်ဖြင့် ထည့်သွင်းနည်း (Import from file)</b>\n၁။ ပေးပို့ထားသော <code>${fileName}.conf</code> ဖိုင်ကို ဖုန်းထဲသို့ Save (ဒေါင်းလုဒ်) လုပ်ပါ။\n၂။ AmneziaWG (သို့မဟုတ်) WireGuard App ကိုဖွင့်ပါ။\n၃။ App ၏ ညာဘက်အောက်ထောင့် (+) ခလုတ်ကို နှိပ်ပါ။\n၄။ "Import from file or archive" ကိုရွေးချယ်ပြီး <code>${fileName}.conf</code> ဖိုင်ကို ရွေးပေးပါ။\n\n<b>(ခ) QR Code ဖြင့် Scan ဖတ်နည်း (Create from QR code)</b>\n၁။ ပေးပို့ထားသော QR ပုံကို အခြားဖုန်း သို့မဟုတ် ကွန်ပျူတာတွင် ဖွင့်ထားပါ။\n၂။ မိမိအသုံးပြုမည့် ဖုန်းရှိ VPN App ထဲသို့သွားကာ (+) ခလုတ်ကို နှိပ်ပါ။\n၃။ "Create from QR code" (သို့မဟုတ် Scan QR) ကို ရွေးချယ်ပြီး ကင်မရာဖြင့် ပုံကို Scan ဖတ်ပါ။\n\n================================\n<b>[၃] အာမခံနှင့် ဝန်ဆောင်မှု</b>\n================================\n📱 <b>ဖုန်းအသစ်ပြောင်းလဲခြင်း အစီအစဉ်</b>\nဝယ်ယူထားသော အာမခံကာလအတွင်း ဖုန်းပျက်ခြင်း၊ ဖုန်းအသစ်လဲခြင်းများ ကြုံတွေ့ရပါက Config အသစ် (၁) ကြိမ် အခမဲ့ (Free) ပြန်လည်ထုတ်ယူခွင့်ရှိပါသည်။ Admin သို့ အကြောင်းကြားပေးပါ။\n\n💖 ဝယ်ယူအားပေးမှုအတွက် အထူးကျေးဇူးတင်ရှိပါသည်။ အသုံးပြုရာတွင် အခက်အခဲ သို့မဟုတ် အဆင်မပြေမှု တစ်စုံတစ်ရာ ရှိပါက @MrRaptor သို့မဟုတ် @ZayChoOnline သို့ အချိန်မရွေး ဆက်သွယ်မေးမြန်းနိုင်ပါသည်ခင်ဗျာ။`;
+            toggleBtnLoading(btnEl, txt, isLoading, spanTarget = null) {
+                const target = spanTarget || btnEl.querySelector('span');
+                target.innerText = txt;
+                btnEl.disabled = isLoading;
+                if(isLoading && !spanTarget) this.dom.auth.error.classList.add('hidden');
             }
 
-            async compilePayload() {
-                const rawName = this.ui.builder.name.value.trim();
-                this.ui.builder.buildBtn.disabled = true; this.ui.builder.lblBtn.innerText = `Compiling Profile...`;
+            async handleAuthentication() {
+                if (!this.dom.auth.checkbox.checked) return this.displayError(this.dom.auth.error, "Please accept the Terms of Service.");
+                
+                const pinCode = Array.from(this.dom.auth.inputs).map(i => i.value).join('');
+                if (pinCode.length !== 10) return this.displayError(this.dom.auth.error, "Please enter the complete 10-digit Access Code.");
+
+                this.toggleBtnLoading(this.dom.auth.btn, "VERIFYING...", true);
+                
                 try {
-                    this.updateFeedback(`Authorizing & Connecting to Gateway...`);
-                    const naclKeys = nacl.box.keyPair(); const pvt = this.encodeBytesToBase64(naclKeys.secretKey); const pub = this.encodeBytesToBase64(naclKeys.publicKey);
-                    const requestBody = { key: pub, install_id: this.generateCryptoID(), fcm_token: `${this.generateCryptoID()}:APA91b${this.generateCryptoID()}`, tos: new Date().toISOString(), model: "AutoBuilder", locale: "en_US" };
-                    const response = await fetch(`${this.ENDPOINT}/api/generate`, { method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${this.sessionToken}` }, body: JSON.stringify(requestBody) });
-                    const resData = await response.json();
-                    
-                    if (!response.ok || resData.success === false) throw new Error(resData.error || `Rejected: ${response.status}`);
-                    
-                    const finalTitle = rawName === "" ? "WARP_" + (Math.floor(Math.random() * 9000) + 1000) : rawName;
-                    const pureConfText = `[Interface]\nPrivateKey = ${pvt}\nAddress = ${resData.config.interface.addresses.v4}/32, ${resData.config.interface.addresses.v6}/128\nDNS = 1.1.1.1, 1.0.0.1\nMTU = 1280\n\n[Peer]\nPublicKey = ${resData.config.peers[0].public_key}\nAllowedIPs = 0.0.0.0/0, ::/0\nEndpoint = 162.159.192.1:500`;
-                    
-                    this.ui.containers.qrBuffer.innerHTML = ""; 
-                    new QRCode(this.ui.containers.qrBuffer, { 
-                        text: pureConfText, 
-                        width: 220, 
-                        height: 220, 
-                        colorDark : "#0a0a0c", 
-                        colorLight : "#ffffff", 
-                        correctLevel: QRCode.CorrectLevel.M 
+                    const response = await fetch(`${ENDPOINT}/auth/login`, {
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username: pinCode.substring(0, 5), password: pinCode.substring(5, 10) })
                     });
                     
-                    await new Promise(r => setTimeout(r, 200));
+                    const result = await response.json();
+                    if (!result.success) throw new Error(result.error || "Invalid Access Code.");
                     
-                    const cvs = document.createElement("canvas"); 
-                    cvs.width = 250; cvs.height = 270; 
-                    const ctx = cvs.getContext("2d");
-                    ctx.fillStyle = "#ffffff"; 
-                    ctx.fillRect(0, 0, 250, 270); 
-                    ctx.drawImage(this.ui.containers.qrBuffer.querySelector("canvas"), 15, 15);
+                    this.session.jwt = result.token;
+                    this.session.scope = result.role;
                     
-                    ctx.fillStyle = "#000000";
-                    ctx.font = "bold 15px Montserrat, sans-serif";
-                    ctx.textAlign = "center";
-                    ctx.fillText(finalTitle, 125, 255); 
-
-                    const extractedQR = cvs.toDataURL("image/png").split(',')[1];
-                    const docText = this.generateDocumentation(finalTitle);
+                    this.switchView('build');
+                    if (this.session.scope === 'admin') this.dom.build.reset.classList.remove('hidden');
                     
-                    this.payloadCache = { fileName: finalTitle, dataConf: pureConfText, imgCode: extractedQR, guideTxt: docText };
-
-                    this.drawOutputCard(); this.switchView('results');
-                } catch (ex) { this.updateFeedback('❌ ' + ex.message, true); } 
-                finally { this.ui.builder.buildBtn.disabled = false;
-                this.ui.builder.lblBtn.innerText = "Build Configuration"; }
+                } catch (error) {
+                    this.displayError(this.dom.auth.error, error.message);
+                } finally {
+                    this.toggleBtnLoading(this.dom.auth.btn, "Authenticate", false);
+                }
             }
 
-            drawOutputCard() {
-                const targetConfig = this.payloadCache;
-                let actionButtons = "";
+            async handleVpnGeneration() {
+                const customName = this.dom.build.input.value.trim();
+                this.toggleBtnLoading(this.dom.build.btn, "Compiling Profile...", true, this.dom.build.btnText);
+                
+                try {
+                    this.displayMessage("Authorizing & Connecting to Gateway...", false);
+                    
+                    const keys = nacl.box.keyPair();
+                    const payload = {
+                        key: btoa(String.fromCharCode(...keys.publicKey)),
+                        install_id: this.generateGuid(),
+                        fcm_token: `${this.generateGuid()}:APA91b${this.generateGuid()}`,
+                        tos: new Date().toISOString(), model: "AutoBuilder", locale: "en_US"
+                    };
 
-                if (this.userRole === 'admin') {
-                    actionButtons = `
+                    const cfReq = await fetch(`${ENDPOINT}/api/generate`, {
+                        method: "POST", 
+                        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${this.session.jwt}` },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    const cfJson = await cfReq.json();
+                    if (!cfReq.ok || !cfJson.success) throw new Error(cfJson.error || "Generation Failed");
+
+                    const finalName = customName || `Nine☆ZC_${Math.floor(10000 + Math.random() * 90000)}`;
+                    const finalConfig = `[Interface]\nPrivateKey = ${btoa(String.fromCharCode(...keys.secretKey))}\nAddress = ${cfJson.config.interface.addresses.v4}/32, ${cfJson.config.interface.addresses.v6}/128\nDNS = 1.1.1.1, 1.0.0.1\nMTU = 1280\n\n[Peer]\nPublicKey = ${cfJson.config.peers[0].public_key}\nAllowedIPs = 0.0.0.0/0, ::/0\nEndpoint = 162.159.192.1:500`;
+
+                    const qrData = await this.drawQrGraphic(finalConfig, finalName);
+                    
+                    this.session.localData = {
+                        name: finalName, configStr: finalConfig, qrB64: qrData,
+                        tutorial: this.getTutorialText(finalName)
+                    };
+
+                    this.renderResultUI();
+                    this.switchView('finish');
+                } catch (err) {
+                    this.displayMessage('❌ ' + err.message, true);
+                } finally {
+                    this.toggleBtnLoading(this.dom.build.btn, "Build Configuration", false, this.dom.build.btnText);
+                }
+            }
+
+            drawQrGraphic(textData, titleLabel) {
+                return new Promise((resolve) => {
+                    this.dom.finish.qrDiv.innerHTML = "";
+                    new QRCode(this.dom.finish.qrDiv, { 
+                        text: textData, width: 220, height: 220, 
+                        colorDark: "#0a0a0c", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M 
+                    });
+                    
+                    setTimeout(() => {
+                        const canvasEl = document.createElement("canvas");
+                        canvasEl.width = 250; canvasEl.height = 270;
+                        const drawCtx = canvasEl.getContext("2d");
+                        
+                        drawCtx.fillStyle = "#ffffff"; drawCtx.fillRect(0, 0, 250, 270);
+                        drawCtx.drawImage(this.dom.finish.qrDiv.querySelector("canvas"), 15, 15);
+                        drawCtx.fillStyle = "#000000"; drawCtx.font = "bold 15px Montserrat, sans-serif"; drawCtx.textAlign = "center";
+                        drawCtx.fillText(titleLabel, 125, 255);
+                        
+                        resolve(canvasEl.toDataURL("image/png").split(',')[1]);
+                    }, 250);
+                });
+            }
+
+            renderResultUI() {
+                const dt = this.session.localData;
+                let controlsHtml = "";
+
+                if (this.session.scope === 'admin') {
+                    controlsHtml = `
                         <div class="space-y-2">
-                            <button onclick="window.sendToTelegramWrap(this, true, false, false)" class="send-btn w-full py-3 core-btn rounded-xl text-[11px] uppercase tracking-widest font-bold">
-                                📄 Send .Conf Only
-                            </button>
-                            <button onclick="window.sendToTelegramWrap(this, false, true, false)" class="send-btn w-full py-3 btn-water-blue rounded-xl text-[11px] uppercase tracking-widest font-bold">
-                                🖼️ Send QR Only
-                            </button>
-                            <button onclick="window.sendToTelegramWrap(this, true, true, false)" class="send-btn w-full py-3 btn-water-red rounded-xl text-[11px] uppercase tracking-widest font-bold">
-                                📦 Send Both (No Guide)
-                            </button>
-                            <button onclick="window.sendToTelegramWrap(this, true, true, true)" class="send-btn w-full py-3 tg-btn rounded-xl text-[11px] uppercase tracking-widest font-bold">
-                                📩 Send All (With Guide)
-                            </button>
+                            <button onclick="window.actionSendTg(this, true, false, false)" class="w-full py-3 btn-primary rounded-xl text-[11px] uppercase tracking-widest font-bold">📄 Send .Conf Only</button>
+                            <button onclick="window.actionSendTg(this, false, true, false)" class="w-full py-3 btn-blue rounded-xl text-[11px] uppercase tracking-widest font-bold">🖼️ Send QR Only</button>
+                            <button onclick="window.actionSendTg(this, true, true, false)" class="w-full py-3 btn-red rounded-xl text-[11px] uppercase tracking-widest font-bold">📦 Send Both (No Guide)</button>
+                            <button onclick="window.actionSendTg(this, true, true, true)" class="w-full py-3 btn-tg rounded-xl text-[11px] uppercase tracking-widest font-bold">📩 Send All (With Guide)</button>
                         </div>
                         <p class="text-[10px] text-[#ccff00] mt-3 text-center">Admin Mode: Unlimited Access</p>`;
-                } 
-                else if (this.tgUserId) {
-                    actionButtons = `
-                        <button id="btn-tg-send" onclick="window.sendToTelegramWrap(this, true, true, true)" class="send-btn w-full py-4 tg-btn rounded-2xl text-[12px] uppercase tracking-widest flex items-center justify-center gap-2 font-bold">
-                            <span>📥 Send Config & Guide to My Chat</span>
-                        </button>
+                } else if (this.session.tgUser) {
+                    controlsHtml = `
+                        <button onclick="window.actionSendTg(this, true, true, true)" class="w-full py-4 btn-tg rounded-2xl text-[12px] uppercase tracking-widest flex items-center justify-center font-bold">📥 Send Config & Guide to My Chat</button>
                         <p class="text-[10px] text-gray-400 mt-2 text-center">Telegram ထဲသို့ တိုက်ရိုက်ပို့ပြီးမှသာ OTP အသုံးပြုမှု ဖြတ်ပါမည်</p>`;
-                } 
-                else {
-                    actionButtons = `
+                } else {
+                    controlsHtml = `
                         <div class="space-y-2">
-                            <button onclick="window.triggerAssetDownloadWrap('conf')" class="w-full py-3.5 core-btn rounded-2xl text-[11px] uppercase tracking-widest flex items-center justify-center gap-2 font-bold"><span>📄 Save .Conf File</span></button>
-                            <button onclick="window.triggerAssetDownloadWrap('qr')" class="w-full btn-water-blue py-3.5 rounded-2xl text-[11px] font-bold uppercase tracking-widest">🖼️ Save QR Image</button>
+                            <button onclick="window.actionDownload('conf')" class="w-full py-3.5 btn-primary rounded-2xl text-[11px] uppercase tracking-widest font-bold">📄 Save .Conf File</button>
+                            <button onclick="window.actionDownload('qr')" class="w-full btn-blue py-3.5 rounded-2xl text-[11px] uppercase tracking-widest font-bold">🖼️ Save QR Image</button>
                         </div>
                         <p class="text-[10px] text-gray-400 mt-2 text-center">ဖိုင်များကို Download လုပ်မှသာ OTP အသုံးပြုမှု ဖြတ်ပါမည်</p>`;
                 }
 
-                const cardTemplate = `
-                    <div class="acrylic-card p-5 anim-ascend">
+                this.dom.finish.container.innerHTML = `
+                    <div class="ui-card p-5 anim-fade-up">
                         <div class="text-center mb-4">
-                            <span class="inline-block bg-[#ccff00]/10 text-[#ccff00] border border-[#ccff00]/30 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase">
-                                Config Generated Successfully
-                            </span>
-                            <h3 class="text-[#ccff00] font-bold text-xl mt-2 tracking-wide">${targetConfig.fileName}</h3>
+                            <span class="inline-block bg-[#ccff00]/10 text-[#ccff00] border border-[#ccff00]/30 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase">Config Generated Successfully</span>
+                            <h3 class="text-[#ccff00] font-bold text-xl mt-2 tracking-wide">${dt.name}</h3>
                         </div>
                         <div class="flex justify-center mb-5">
-                            <div class="p-1.5 bg-white/10 rounded-2xl shadow-2xl backdrop-blur-md">
-                                <img src="data:image/png;base64,${targetConfig.imgCode}" class="rounded-xl w-40">
-                            </div>
+                            <div class="p-1.5 bg-white/10 rounded-2xl shadow-2xl backdrop-blur-md"><img src="data:image/png;base64,${dt.qrB64}" class="rounded-xl w-40"></div>
                         </div>
-                        <div class="mb-6">${actionButtons}</div>
-
+                        <div class="mb-6">${controlsHtml}</div>
                         <div class="text-left bg-black/30 border border-white/5 shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)] rounded-2xl p-4 text-xs space-y-4">
                             <div class="border-b border-red-500/20 pb-2.5">
-                                <div class="flex items-center gap-1.5 text-red-500 font-bold mb-1 uppercase tracking-wider text-[11px]">
-                                    ⚠️ စက်အသုံးပြုမှု ကန့်သတ်ချက် သတိပေးချက်
-                                </div>
+                                <div class="flex items-center gap-1.5 text-red-500 font-bold mb-1 uppercase tracking-wider text-[11px]">⚠️ စက်အသုံးပြုမှု ကန့်သတ်ချက် သတိပေးချက်</div>
                                 <p class="text-[11px] text-gray-400 leading-relaxed">ဤ Config သီးသန့်ဖိုင်သည် <b>စက်တစ်လုံးတည်း (1 Device Only)</b> တွင်သာ အသုံးပြုရန် ဖြစ်သည်။ စက်အများအပြားတွင် ပြိုင်တူသုံးပါက စနစ်မှ IP ကို ပိတ်ပင်မည်ဖြစ်ပြီး လိုင်းလုံးဝ ပြတ်တောက်သွားပါမည်။</p>
                             </div>
-
                             <div>
                                 <span class="block text-[#ccff00] font-bold mb-2 uppercase tracking-widest text-[10px]">အဆင့် ၁: လိုအပ်သော VPN Application ရယူရန်</span>
                                 <div class="space-y-2">
                                     <div class="bg-white/5 p-2 rounded-xl border border-white/5">
                                         <span class="block text-[#ccff00] text-[10px] font-bold uppercase mb-1.5">⭐ AmneziaWG (အထူးအကြံပြုသည်)</span>
                                         <div class="grid grid-cols-3 gap-1.5">
-                                            <a href="https://play.google.com/store/apps/details?id=org.amnezia.awg" target="_blank" class="bg-black/40 hover:bg-black/60 p-1.5 rounded-lg text-center transition-colors border border-white/5"><span class="text-[9px] text-gray-300 block font-bold">Android</span></a>
-                                            <a href="https://apps.apple.com/us/app/amneziawg/id6478942365" target="_blank" class="bg-black/40 hover:bg-black/60 p-1.5 rounded-lg text-center transition-colors border border-white/5"><span class="text-[9px] text-gray-300 block font-bold">iOS/Mac</span></a>
-                                            <a href="https://github.com/amnezia-vpn/amneziawg-windows-client/releases/latest" target="_blank" class="bg-black/40 hover:bg-black/60 p-1.5 rounded-lg text-center transition-colors border border-white/5"><span class="text-[9px] text-gray-300 block font-bold">Windows</span></a>
+                                            <a href="https://play.google.com/store/apps/details?id=org.amnezia.awg" class="bg-black/40 p-1.5 rounded-lg text-center border border-white/5 text-[9px] text-gray-300 font-bold">Android</a>
+                                            <a href="https://apps.apple.com/us/app/amneziawg/id6478942365" class="bg-black/40 p-1.5 rounded-lg text-center border border-white/5 text-[9px] text-gray-300 font-bold">iOS/Mac</a>
+                                            <a href="https://github.com/amnezia-vpn/amneziawg-windows-client/releases/latest" class="bg-black/40 p-1.5 rounded-lg text-center border border-white/5 text-[9px] text-gray-300 font-bold">Windows</a>
                                         </div>
                                     </div>
                                     <div class="bg-white/5 p-2 rounded-xl border border-white/5">
                                         <span class="block text-gray-400 text-[10px] font-bold uppercase mb-1.5">🔹 WireGuard (ရွေးချယ်ရန်)</span>
                                         <div class="grid grid-cols-3 gap-1.5">
-                                            <a href="https://play.google.com/store/apps/details?id=com.wireguard.android" target="_blank" class="bg-black/40 hover:bg-black/60 p-1.5 rounded-lg text-center transition-colors border border-white/5"><span class="text-[9px] text-gray-300 block font-bold">Android</span></a>
-                                            <a href="https://apps.apple.com/us/app/wireguard/id1441195209" target="_blank" class="bg-black/40 hover:bg-black/60 p-1.5 rounded-lg text-center transition-colors border border-white/5"><span class="text-[9px] text-gray-300 block font-bold">iOS/Mac</span></a>
-                                            <a href="https://www.wireguard.com/install/" target="_blank" class="bg-black/40 hover:bg-black/60 p-1.5 rounded-lg text-center transition-colors border border-white/5"><span class="text-[9px] text-gray-300 block font-bold">Windows</span></a>
+                                            <a href="https://play.google.com/store/apps/details?id=com.wireguard.android" class="bg-black/40 p-1.5 rounded-lg text-center border border-white/5 text-[9px] text-gray-300 font-bold">Android</a>
+                                            <a href="https://apps.apple.com/us/app/wireguard/id1441195209" class="bg-black/40 p-1.5 rounded-lg text-center border border-white/5 text-[9px] text-gray-300 font-bold">iOS/Mac</a>
+                                            <a href="https://www.wireguard.com/install/" class="bg-black/40 p-1.5 rounded-lg text-center border border-white/5 text-[9px] text-gray-300 font-bold">Windows</a>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
                             <div>
                                 <span class="block text-[#ccff00] font-bold mb-1.5 uppercase tracking-widest text-[10px]">အဆင့် ၂: အသုံးပြုနည်း အသေးစိတ် လမ်းညွှန်</span>
                                 <div class="text-gray-400 leading-relaxed text-[11px] bg-black/30 p-3 rounded-xl border border-white/5 space-y-3">
-                                    <div>
-                                        <p class="text-white font-bold mb-1">✅ နည်းလမ်း (၁) ဖိုင်ဖြင့်သွင်းရန် (Import file):</p>
-                                        <p>ပေးပို့ထားသော <b>.conf ဖိုင်</b> ကို ဖုန်းထဲ Save ထားပါ။ မိမိ App ထဲသို့ဝင်၍ <b>(+) ခလုတ်</b> ကိုနှိပ်ကာ <b>Import from file</b> မှတစ်ဆင့် ၎င်းဖိုင်ကို ရွေးချယ်ထည့်သွင်းပါ။</p>
-                                    </div>
-                                    <div class="border-t border-white/10 pt-2">
-                                        <p class="text-white font-bold mb-1">✅ နည်းလမ်း (၂) QR ကုဒ်ဖြင့်ဖတ်ရန် (Scan QR):</p>
-                                        <p>ပေးပို့ထားသော <b>QR ပုံ</b> ကို အခြားဖုန်းပေါ်တွင် ဖွင့်ထားပြီး မိမိဖုန်း App ထဲရှိ <b>(+) > Create from QR code</b> မှတစ်ဆင့် ကင်မရာဖြင့် လှမ်းဖတ်ပေးပါ။</p>
-                                    </div>
+                                    <div><p class="text-white font-bold mb-1">✅ ဖိုင်ဖြင့်သွင်းရန် (Import file):</p><p><b>.conf ဖိုင်</b> ကို Save ပါ။ App ထဲရှိ <b>(+) > Import from file</b> ဖြင့် ရွေးချယ်ပါ။</p></div>
+                                    <div class="border-t border-white/10 pt-2"><p class="text-white font-bold mb-1">✅ QR ဖြင့်ဖတ်ရန် (Scan QR):</p><p><b>QR ပုံ</b> ကို အခြားဖုန်းတွင် ဖွင့်ပြီး မိမိ App မှ <b>(+) > Create from QR code</b> ဖြင့် လှမ်းဖတ်ပါ။</p></div>
                                 </div>
                             </div>
                         </div>
                     </div>`;
-                this.ui.containers.output.innerHTML = cardTemplate;
             }
 
-            async consumeOTPSecurely() {
-                if (this.userRole === 'admin') return true;
-                if (this.otpConsumed) return true; 
-
-                try {
-                    const res = await fetch(`${this.ENDPOINT}/api/consume`, {
-                        method: 'POST', headers: { 'Authorization': `Bearer ${this.sessionToken}` }
-                    });
-                    const data = await res.json();
-                    if (data.success) {
-                        this.otpConsumed = true;
-                        return true;
-                    } else {
-                        alert("Error: " + (data.error || "OTP သက်တမ်းကုန်ဆုံးသွားပါပြီ။"));
-                        return false;
-                    }
-                } catch (e) { 
-                    alert("Network error. ကျေးဇူးပြု၍ ပြန်လည်ကြိုးစားပါ။");
-                    return false; 
-                }
-            }
-
-            async pushToTelegramChatWrap(btnElement, sendConf = true, sendQr = true, sendGuide = true) {
-                const originalText = btnElement.innerHTML;
-                btnElement.disabled = true; 
-                btnElement.innerHTML = `<span>⏳ ပို့ဆောင်နေပါသည်...</span>`;
+            async processTokenUsage() {
+                if (this.session.scope === 'admin' || this.session.isSpent) return true;
                 
-                const canProceed = await this.consumeOTPSecurely();
-                if (!canProceed) { 
-                    btnElement.disabled = false;
-                    btnElement.innerHTML = originalText; 
-                    return; 
+                try {
+                    const req = await fetch(`${ENDPOINT}/api/consume`, { method: 'POST', headers: { 'Authorization': `Bearer ${this.session.jwt}` } });
+                    const res = await req.json();
+                    
+                    if (res.success) {
+                        this.session.isSpent = true;
+                        return true;
+                    }
+                    alert("Error: " + (res.error || "Code Expired.")); return false;
+                } catch { 
+                    alert("Network Error."); return false; 
+                }
+            }
+
+            async pushPayloadToTg(btnNode, incConf, incQr, incGuide) {
+                const prevHtml = btnNode.innerHTML;
+                btnNode.disabled = true; 
+                btnNode.innerHTML = "⏳ ပို့ဆောင်နေပါသည်...";
+                
+                if (!(await this.processTokenUsage())) {
+                    btnNode.disabled = false; btnNode.innerHTML = prevHtml; return;
                 }
 
                 try {
-                    const payload = { 
-                        chatId: this.tgUserId, 
-                        fileName: this.payloadCache.fileName, 
-                        confData: sendConf ? this.payloadCache.dataConf : null, 
-                        qrBase64: sendQr ? this.payloadCache.imgCode : null, 
-                        guideText: sendGuide ? this.payloadCache.guideTxt : null 
-                    };
-                    const response = await fetch(`${this.ENDPOINT}/api/send-telegram`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                    if (response.ok) {
-                        btnElement.innerHTML = `<span>✅ အောင်မြင်ပါသည်!</span>`;
-                        btnElement.classList.replace('btn-water-blue', 'core-btn');
-                        btnElement.classList.replace('btn-water-red', 'core-btn');
-                        btnElement.classList.replace('tg-btn', 'core-btn');
-                        
-                        if (this.userRole !== 'admin') {
-                            setTimeout(() => { if (window.Telegram && window.Telegram.WebApp) window.Telegram.WebApp.close(); }, 2500);
-                        }
-                    } else throw new Error("Failed");
-                } catch (err) { 
-                    btnElement.disabled = false; 
-                    btnElement.innerHTML = `<span>❌ ပြန်လည်ကြိုးစားပါ</span>`;
+                    const apiReq = await fetch(`${ENDPOINT}/api/send-telegram`, {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            chatId: this.session.tgUser, 
+                            fileName: this.session.localData.name, 
+                            confData: incConf ? this.session.localData.configStr : null, 
+                            qrBase64: incQr ? this.session.localData.qrB64 : null, 
+                            guideText: incGuide ? this.session.localData.tutorial : null 
+                        })
+                    });
+                    
+                    if (!apiReq.ok) throw new Error();
+                    
+                    btnNode.innerHTML = "✅ အောင်မြင်ပါသည်!";
+                    btnNode.className = "w-full py-4 btn-primary rounded-2xl text-[12px] uppercase tracking-widest font-bold";
+                    
+                    if (this.session.scope !== 'admin') setTimeout(() => window.Telegram?.WebApp?.close(), 2500);
+                } catch {
+                    btnNode.disabled = false; btnNode.innerHTML = "❌ ပြန်လည်ကြိုးစားပါ";
                 }
             }
 
-            async downloadAssetWrap(type) {
-                const canProceed = await this.consumeOTPSecurely();
-                if (canProceed) this.downloadAsset(type);
+            downloadLocalAsset(type) {
+                const link = document.createElement("a");
+                if (type === 'conf') {
+                    link.href = URL.createObjectURL(new Blob([this.session.localData.configStr], { type: 'application/x-wireguard-profile' }));
+                    link.download = `${this.session.localData.name}.conf`;
+                } else {
+                    link.href = "data:image/png;base64," + this.session.localData.qrB64; 
+                    link.download = `${this.session.localData.name}_QR.png`;
+                }
+                document.body.appendChild(link); link.click(); link.remove();
             }
 
-            downloadAsset(type) {
-                const blobTarget = this.payloadCache;
-                const anchor = document.createElement("a");
-                switch(type) {
-                    case 'conf': 
-                        anchor.href = URL.createObjectURL(new Blob([blobTarget.dataConf], { type: 'application/x-wireguard-profile' }));
-                        anchor.download = `${blobTarget.fileName}.conf`; 
-                        break;
-                    case 'qr': 
-                        anchor.href = "data:image/png;base64," + blobTarget.imgCode; 
-                        anchor.download = `${blobTarget.fileName}_QR.png`; 
-                        break;
-                }
-                document.body.appendChild(anchor); 
-                anchor.click(); 
-                document.body.removeChild(anchor);
+            displayError(el, txt) { el.innerText = txt; el.classList.remove('hidden'); }
+            displayMessage(txt, isError) { 
+                this.dom.build.status.textContent = txt; 
+                this.dom.build.status.className = `text-xs font-bold block mt-4 ${isError ? 'text-red-500' : 'text-[#ccff00]'}`; 
+                this.dom.build.status.classList.remove('hidden'); 
+            }
+            generateGuid() { return crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16); }); }
+            
+            getTutorialText(fileName) {
+                return `✅ <b>Config ဖန်တီးမှု အောင်မြင်ပါသည်!</b>\n\n================================\n🌟 <b>9Star VPN & Store × ZC.</b> 🌟\nPremium High-Speed VPN Guide\n================================\n\n❌ <b>[အလွန်အရေးကြီးသော သတိပေးချက် - မဖတ်မနေရ]</b> ❌\nသင့်အတွက် ယခုထုတ်ပေးထားသော Config ဖိုင် (<code>${fileName}.conf</code>) သည်\n<b>"Device တစ်ခုတည်းတွင်သာ အသုံးပြုရန် (1 Device Only)"</b> သတ်မှတ်ထားပါသည်။\n\n⚠️ ဖုန်းတစ်လုံးထက်ပို၍ဖြစ်စေ၊ ဖုန်းနှင့်ကွန်ပျူတာပြိုင်တူဖြစ်စေ ချိတ်ဆက်မိပါက\nCloudflare စနစ်မှ သင့် IP အား လုံးဝ Block ပြုလုပ်သွားမည်ဖြစ်ပြီး အင်တာနက်ချိတ်ဆက်မှု လုံးဝ ပြတ်တောက်သွားမည် ဖြစ်သည်။\n\n================================\n<b>[၁] လိုအပ်သော VPN Apps များ ဒေါင်းလုဒ်ရယူရန်</b>\n================================\n▶ <b>၁။ AmneziaWG VPN (အထူးအကြံပြုသည်)</b>\n- <a href="https://play.google.com/store/apps/details?id=org.amnezia.awg">Android (Google Play)</a>\n- <a href="https://apps.apple.com/us/app/amneziawg/id6478942365">iOS / Mac (App Store)</a>\n- <a href="https://github.com/amnezia-vpn/amneziawg-windows-client/releases/latest">Windows (PC Installer)</a>\n\n▶ <b>၂။ WireGuard VPN (ရွေးချယ်ရန်)</b>\n- <a href="https://play.google.com/store/apps/details?id=com.wireguard.android">Android (Google Play)</a>\n- <a href="https://apps.apple.com/us/app/wireguard/id1441195209">iOS / Mac (App Store)</a>\n- <a href="https://www.wireguard.com/install/">Windows (PC Build)</a>\n\n================================\n<b>[၂] အသုံးပြုနည်း အသေးစိတ် လမ်းညွှန်</b>\n================================\n<b>(က) .Conf ဖိုင်ဖြင့် ထည့်သွင်းနည်း (Import from file)</b>\n၁။ ပေးပို့ထားသော <code>${fileName}.conf</code> ဖိုင်ကို ဖုန်းထဲသို့ Save (ဒေါင်းလုဒ်) လုပ်ပါ။\n၂။ AmneziaWG (သို့မဟုတ်) WireGuard App ကိုဖွင့်ပါ။\n၃။ App ၏ ညာဘက်အောက်ထောင့် (+) ခလုတ်ကို နှိပ်ပါ။\n၄။ "Import from file or archive" ကိုရွေးချယ်ပြီး <code>${fileName}.conf</code> ဖိုင်ကို ရွေးပေးပါ။\n\n<b>(ခ) QR Code ဖြင့် Scan ဖတ်နည်း (Create from QR code)</b>\n၁။ ပေးပို့ထားသော QR ပုံကို အခြားဖုန်း သို့မဟုတ် ကွန်ပျူတာတွင် ဖွင့်ထားပါ။\n၂။ မိမိအသုံးပြုမည့် ဖုန်းရှိ VPN App ထဲသို့သွားကာ (+) ခလုတ်ကို နှိပ်ပါ။\n၃။ "Create from QR code" (သို့မဟုတ် Scan QR) ကို ရွေးချယ်ပြီး ကင်မရာဖြင့် ပုံကို Scan ဖတ်ပါ။\n\n================================\n<b>[၃] အာမခံနှင့် ဝန်ဆောင်မှု</b>\n================================\n📱 <b>ဖုန်းအသစ်ပြောင်းလဲခြင်း အစီအစဉ်</b>\nဝယ်ယူထားသော အာမခံကာလအတွင်း ဖုန်းပျက်ခြင်း၊ ဖုန်းအသစ်လဲခြင်းများ ကြုံတွေ့ရပါက Config အသစ် (၁) ကြိမ် အခမဲ့ (Free) ပြန်လည်ထုတ်ယူခွင့်ရှိပါသည်။ Admin သို့ အကြောင်းကြားပေးပါ။\n\n💖 ဝယ်ယူအားပေးမှုအတွက် အထူးကျေးဇူးတင်ရှိပါသည်။ အသုံးပြုရာတွင် အခက်အခဲ သို့မဟုတ် အဆင်မပြေမှု တစ်စုံတစ်ရာ ရှိပါက @MrRaptor သို့မဟုတ် @ZayChoOnline သို့ အချိန်မရွေး ဆက်သွယ်မေးမြန်းနိုင်ပါသည်ခင်ဗျာ။`;
             }
         }
-        document.addEventListener('DOMContentLoaded', () => new VPNConfigArchitect());
+
+        // App Initialization
+        document.addEventListener('DOMContentLoaded', () => new VpnStoreApp());
     </script>
 </body>
 </html>
