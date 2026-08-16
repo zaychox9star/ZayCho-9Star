@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Created by Mr.Raptor (AmneziaWG Portal)</title>
+    
+    <!-- Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tweetnacl@1.0.3/nacl.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { 
+            --theme-prim: #ccff00; --glow-prim: rgba(204, 255, 0, 0.4); 
+            --theme-dan: #dc2626; --glow-dan: rgba(220, 38, 38, 0.4); 
+            --bg-base: #0a0a0c;
+        }
+        body { background-color: var(--bg-base); color: #fff; font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
+        
+        /* Ambient Background */
+        .ambient-map { position: fixed; inset: 0; z-index: -2; background-color: var(--theme-prim); -webkit-mask-image: url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_map_blank_without_borders.svg'); mask-image: url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_map_blank_without_borders.svg'); -webkit-mask-size: cover; mask-size: cover; opacity: 0.05; }
+        .ambient-lights { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at 15% 20%, rgba(220, 38, 38, 0.1) 0%, transparent 40%), radial-gradient(circle at 85% 80%, rgba(204, 255, 0, 0.05) 0%, transparent 40%); pointer-events: none; }
+        
+        .title-primary { font-family: 'Montserrat', sans-serif; font-weight: 900; }
+        
+        /* Glass Components */
+        .glass-box { background: linear-gradient(145deg, rgba(30, 30, 35, 0.45) 0%, rgba(10, 10, 15, 0.65) 100%); backdrop-filter: blur(24px); border-top: 1px solid rgba(255, 255, 255, 0.1); border-left: 1px solid rgba(255, 255, 255, 0.05); border-radius: 28px; box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.8); }
+        .glass-inner { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 20px; }
+        
+        /* Inputs & Buttons */
+        .field-input { background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s; }
+        .field-input:focus { background: rgba(204, 255, 0, 0.05); border-color: var(--theme-prim); outline: none; }
+        
+        .btn-main { background: linear-gradient(135deg, rgba(204, 255, 0, 0.9) 0%, rgba(153, 204, 0, 0.9) 100%); color: #000; transition: all 0.3s; }
+        .btn-main:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(204, 255, 0, 0.4); }
+        .btn-main:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        /* Scrollbar & Animations */
+        .custom-scroll::-webkit-scrollbar { width: 5px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(204,255,0,0.3); border-radius: 10px; }
+        .custom-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-start p-4 pt-8">
+
+    <div class="ambient-map"></div>
+    <div class="ambient-lights"></div>
+
+    <header class="w-full text-center fade-in pb-8">
+        <div class="flex flex-col items-center justify-center gap-1">
+            <p class="text-gray-400 text-[11px] font-bold tracking-widest uppercase mb-1">Created by</p>
+            <div class="flex items-center justify-center gap-2">
+                <h1 class="title-primary text-4xl md:text-5xl drop-shadow-[0_0_15px_rgba(220,38,38,0.6)]" style="color: var(--theme-dan);">Mr.</h1>
+                <h1 class="title-primary text-4xl md:text-5xl drop-shadow-[0_0_15px_rgba(204,255,0,0.6)]" style="color: var(--theme-prim);">Raptor</h1>
+            </div>
+        </div>
+        <p class="text-[#ccff00] text-[10px] md:text-xs font-bold tracking-widest uppercase mt-3 bg-[#ccff00]/10 inline-block px-4 py-1.5 rounded-full border border-[#ccff00]/20">AmneziaWG Advanced Generator</p>
+    </header>
+
+    <!-- Single Page UI: အားလုံးကို Main တစ်ခုတည်းတွင် ပေါင်းထားသည် -->
+    <main class="w-full max-w-md relative z-10 space-y-6 pb-12">
+        
+        <!-- BUILDER SECTION -->
+        <section class="glass-box p-6 md:p-8 text-center fade-in">
+            <h2 class="text-white font-bold text-sm tracking-widest uppercase mb-1">Create Secure Profile</h2>
+            <p class="text-xs text-gray-400 mb-6">Auto-Routing Enabled (DPI Bypass)</p>
+
+            <div class="mb-6">
+                <input type="text" id="input-name" placeholder="Custom Name (Optional)" class="w-full field-input rounded-2xl px-4 py-4 text-sm text-white text-center font-bold tracking-wide placeholder-gray-500">
+                <p class="text-[10px] text-gray-500 mt-2 text-left px-2">Leave blank for auto-generated name (e.g., amnezia12345wg)</p>
+            </div>
+            
+            <button id="btn-generate" class="btn-main w-full py-4 rounded-2xl font-black uppercase tracking-widest text-sm flex justify-center items-center gap-2">
+                ⚡ <span id="btn-text">Generate Config</span>
+            </button>
+            <p id="status-msg" class="text-[11px] font-bold hidden mt-4 tracking-wider uppercase text-center"></p>
+        </section>
+
+        <!-- RESULT SECTION (ပထမဆုံးတွင် ဖျောက်ထားမည်) -->
+        <section id="result-section" class="glass-box p-6 md:p-8 fade-in hidden">
+            
+            <!-- Result Header -->
+            <div class="text-center mb-6 border-b border-white/10 pb-6">
+                <span class="bg-[#ccff00] text-black px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 inline-block">Ready to use</span>
+                <h3 id="res-name" class="text-white font-bold text-xl md:text-2xl tracking-wide">Name</h3>
+                <p id="res-endpoint" class="text-[11px] text-[#ccff00] mt-2 font-mono">Routing: 0.0.0.0</p>
+            </div>
+            
+            <!-- Download Button (Full Width) -->
+            <div class="mb-6">
+                <button id="dl-conf" class="w-full py-4 btn-main rounded-xl text-xs uppercase tracking-widest font-black flex items-center justify-center gap-2">
+                    📄 Save Config File (.Conf)
+                </button>
+            </div>
+
+            <!-- Complete User Guide -->
+            <div class="glass-inner p-4">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-[#ccff00] text-[11px] font-bold uppercase tracking-widest">📝 Installation Guide</span>
+                    <button id="btn-copy" class="text-[10px] bg-white/10 hover:bg-[#ccff00] hover:text-black px-3 py-1.5 rounded uppercase font-bold transition">Copy Text</button>
+                </div>
+                <textarea id="guide-box" readonly class="w-full bg-black/50 border border-white/5 rounded-xl p-3 text-[11px] text-gray-300 font-mono custom-scroll h-80 focus:outline-none resize-none leading-relaxed"></textarea>
+            </div>
+            
+        </section>
+        
+    </main>
+
+    <script>
+        const App = (() => {
+            const WORKER_URL = "https://curly-bonus-7ec5.zaychox9star.workers.dev";
+            const ENDPOINTS = ["8.6.112.87:946", "8.6.112.120:1010", "8.6.112.135:864"];
+
+            const AWG_PARAMS = `Jc = 3
+Jmin = 1
+Jmax = 3
+S1 = 0
+S2 = 0
+H1 = 1
+H2 = 2
+H3 = 3
+H4 = 4
+I1 = <b 0x494e56495445207369703a626f624062696c6f78692e636f6d205349502f322e300d0a5669613a205349502f322e302f55445020706333332e61746c616e74612e636f6d3b6272616e63683d7a39684734624b3737366173646864730d0a4d61782d466f7277617264733a2037300d0a546f3a20426f62203c7369703a626f624062696c6f78692e636f6d3e0d0a46726f6d3a20416c696365203c7369703a616c6963654061746c616e74612e636f6d3e3b7461673d313932383330313737340d0a43616c6c2d49443a20613834623463373665363637313040706333332e61746c616e74612e636f6d0d0a435365713a2033313431353920494e564954450d0a436f6e74656e742d4c656e6774683a20300d0a0d0a>
+I2 = <b 0x5349502f322e302031303020547279696e670d0a5669613a205349502f322e302f55445020706333332e61746c616e74612e636f6d3b6272616e63683d7a39684734624b3737366173646864730d0a546f3a20426f62203c7369703a626f624062696c6f78692e636f6d3e0d0a46726f6d3a20416c696365203c7369703a616c6963654061746c616e74612e636f6d3e3b7461673d313932383330313737340d0a43616c6c2d49443a20613834623463373665363637313040706333332e61746c616e74612e636f6d0d0a435365713a2033313431353920494e564954450d0a436f6e74656e742d4c656e6774683a20300d0a0d0a>`;
+
+            let currentSession = {};
+
+            const UI = {
+                inName: document.getElementById('input-name'),
+                btnGen: document.getElementById('btn-generate'),
+                btnText: document.getElementById('btn-text'),
+                msg: document.getElementById('status-msg'),
+                resSection: document.getElementById('result-section'),
+                guideBox: document.getElementById('guide-box'),
+                dlConf: document.getElementById('dl-conf'),
+                btnCopy: document.getElementById('btn-copy')
+            };
+
+            const setStatus = (loading, text = "") => {
+                UI.btnGen.disabled = loading;
+                UI.btnText.innerText = loading ? "Compiling Profile..." : "Generate Config";
+                if (text) {
+                    UI.msg.textContent = text;
+                    UI.msg.className = `text-[11px] font-bold block mt-4 tracking-wider uppercase ${text.includes('❌') ? 'text-red-500' : 'text-[#ccff00]'}`;
+                    UI.msg.classList.remove('hidden');
+                } else {
+                    UI.msg.classList.add('hidden');
+                }
+            };
+
+            // QR အပိုင်း ဖြုတ်ထားသောကြောင့် Guide ကိုလည်း ပြင်ဆင်ထားသည်
+            const buildGuide = (name) => `✅ AmneziaWG Premium VPN - Created by Mr.Raptor ✅
+(Profile Name: ${name})
+
+⚠️ [အရေးကြီး သတိပေးချက် - ၁ လုံးတည်းသာ သုံးရန်]
+ဤ VPN သည် စက်တစ်လုံးတည်း (1 Device Only) အတွက်သာ သီးသန့်ထုတ်လုပ်ထားခြင်း ဖြစ်ပါသည်။ ဖုန်းတစ်လုံးထက်ပို၍ဖြစ်စေ၊ ကွန်ပျူတာနှင့် ပြိုင်တူဖြစ်စေ ချိတ်ဆက်မိပါက စနစ်မှ အလိုအလျောက် ပိတ်ပင် (Auto Block) မည်ဖြစ်ပြီး လိုင်းလုံးဝ ပြတ်တောက်သွားပါမည်။
+
+📥 [၁] လိုအပ်သော App ဒေါင်းလုဒ်ရယူရန်
+(မှတ်ချက် - vpn ကို AmneziaWG မှာသာအသုံးပြုပါ။)
+
+• Android (Play Store):
+https://play.google.com/store/apps/details?id=org.amnezia.awg
+
+• iOS / Mac (App Store):
+https://apps.apple.com/us/app/amneziawg/id6478942365
+
+• Windows (PC):
+https://github.com/amnezia-vpn/amneziawg-windows-client/releases/latest
+
+
+⚙️ [၂] VPN အသုံးပြုနည်း အသေးစိတ် လမ်းညွှန်
+
+၁။ "SAVE CONFIG FILE (.CONF)" ကို နှိပ်၍ ဖိုင်ကို ဖုန်းထဲသို့ ဒေါင်းလုဒ် (Save) လုပ်ပါ။
+၂။ ဒေါင်းလုဒ်ဆွဲထားသော AmneziaWG App ကို ဖွင့်ပါ။
+၃။ ညာဘက်အောက်ထောင့် (သို့) အပေါ်ထောင့်ရှိ အပေါင်းလက္ခဏာ (+) ခလုတ်ကို နှိပ်ပါ။
+၄။ "Import from file or archive" ကိုရွေးချယ်ပြီး ခုနက ဒေါင်းလုဒ်လုပ်ထားသော .conf ဖိုင်ကို ရွေးချယ်ထည့်သွင်းလိုက်ပါ။
+၅။ ခလုတ်လေးကို ဖွင့် (Turn On) ကာ ချိတ်ဆက်အသုံးပြုနိုင်ပါပြီ။
+
+
+🛡️ ဝန်ဆောင်မှုနှင့် အာမခံချက် (Warranty & Support)
+- အာမခံကာလအတွင်း ဖုန်းပျောက်သွားခြင်း၊ ဖုန်းပျက်သွားခြင်း၊ ဖုန်းအသစ်လဲလှယ်ခြင်းများ ကြုံတွေ့ရပါက Customer များအတွက် Config အသစ် ပြန်လည်ထုတ်ယူခွင့် ရှိပါသည်။
+- ချိတ်ဆက်မှု အဆင်မပြေခြင်း၊ လိုင်းကျခြင်း၊ ချိတ်မရတော့ခြင်း သို့မဟုတ် အခြားအခက်အခဲ တစ်စုံတစ်ရာ ရှိပါက Telegram တွင် Admin 👉 @MrRaptor 👈 သို့ အချိန်မရွေး ဆက်သွယ် အကူအညီ တောင်းခံနိုင်ပါသည်။ 
+- Customer များ အဆင်ပြေစေရန် အကောင်းဆုံး ဖြေရှင်းဆောင်ရွက်ပေးသွားပါမည်။`;
+
+            const generateConfig = async () => {
+                setStatus(true, "Generating Keys...");
+                // Result အဟောင်းကို ဖျောက်ထားမည်
+                UI.resSection.classList.add('hidden');
+                
+                const inputVal = UI.inName.value.trim();
+                const profileName = inputVal !== "" ? inputVal : `amnezia${Math.floor(10000 + Math.random() * 90000)}wg`;
+                const fileSafeName = profileName.replace(/[^a-zA-Z0-9]/g, '_');
+                const selectedEndpoint = ENDPOINTS[Math.floor(Math.random() * ENDPOINTS.length)];
+
+                try {
+                    const keyPair = nacl.box.keyPair();
+                    const privateKey = btoa(String.fromCharCode(...keyPair.secretKey));
+                    const publicKey = btoa(String.fromCharCode(...keyPair.publicKey));
+                    const genUUID = () => crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16); });
+                    
+                    setStatus(true, "Registering with Cloudflare...");
+                    const cleanUrl = WORKER_URL.endsWith('/') ? WORKER_URL.slice(0, -1) : WORKER_URL;
+                    
+                    const res = await fetch(`${cleanUrl}/api/generate`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ key: publicKey, install_id: genUUID(), fcm_token: `${genUUID()}:APA91b${genUUID()}`, tos: new Date().toISOString() })
+                    });
+
+                    const data = await res.json();
+                    if (!res.ok || !data.success) throw new Error(data.error || "API Failed");
+
+                    const finalConfig = `[Interface]
+PrivateKey = ${privateKey}
+Address = ${data.data.ipv4}/32, ${data.data.ipv6}/128
+DNS = 1.1.1.1, 1.0.0.1, 2606:4700:4700::1111, 2606:4700:4700::1001
+MTU = 1280
+${AWG_PARAMS}
+
+[Peer]
+PublicKey = ${data.data.server_public_key}
+AllowedIPs = 0.0.0.0/0, ::/0
+Endpoint = ${selectedEndpoint}
+PersistentKeepalive = 30`;
+
+                    currentSession = { 
+                        name: profileName, 
+                        fileName: fileSafeName, 
+                        endpoint: selectedEndpoint, 
+                        configStr: finalConfig, 
+                        guideStr: buildGuide(profileName) 
+                    };
+                    
+                    // Result များကို ပြသမည်
+                    document.getElementById('res-name').innerText = currentSession.name;
+                    document.getElementById('res-endpoint').innerText = `Auto Routing: ${currentSession.endpoint}`;
+                    UI.guideBox.value = currentSession.guideStr;
+                    
+                    // Input ကို ရှင်းလင်းမည်
+                    UI.inName.value = '';
+                    
+                    // Result Section ကို ပြသမည်
+                    UI.resSection.classList.remove('hidden');
+                    
+                    // Result ဆီသို့ Scroll ဆွဲချပေးမည်
+                    setTimeout(() => {
+                        UI.resSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 100);
+
+                } catch (error) {
+                    setStatus(false, `❌ ${error.message}`);
+                } finally {
+                    setStatus(false);
+                }
+            };
+
+            const downloadConf = () => {
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(new Blob([currentSession.configStr], { type: 'application/x-wireguard-profile' }));
+                a.download = `${currentSession.fileName}.conf`;
+                document.body.appendChild(a); 
+                a.click(); 
+                a.remove();
+            };
+
+            const copyGuide = async () => {
+                try {
+                    await navigator.clipboard.writeText(currentSession.guideStr);
+                    UI.btnCopy.innerText = "Copied! ✅";
+                    UI.btnCopy.classList.replace('bg-white/10', 'bg-[#ccff00]');
+                    UI.btnCopy.classList.replace('text-white', 'text-black');
+                    setTimeout(() => {
+                        UI.btnCopy.innerText = "Copy Text";
+                        UI.btnCopy.classList.replace('bg-[#ccff00]', 'bg-white/10');
+                        UI.btnCopy.classList.replace('text-black', 'text-white');
+                    }, 2000);
+                } catch (e) {
+                    alert("Please select and copy manually.");
+                }
+            };
+
+            return {
+                init: () => {
+                    UI.btnGen.addEventListener('click', generateConfig);
+                    UI.dlConf.addEventListener('click', downloadConf);
+                    UI.btnCopy.addEventListener('click', copyGuide);
+                    
+                    UI.inName.addEventListener('keypress', (e) => { if(e.key === 'Enter') generateConfig(); });
+                }
+            };
+        })();
+
+        document.addEventListener('DOMContentLoaded', App.init);
+    </script>
+</body>
+</html>
