@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mr.Raptor WireGuard Builder</title>
+    
+    <!-- Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tweetnacl@1.0.3/nacl.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { 
+            --theme-prim: #ccff00; 
+            --theme-prim-glow: rgba(204, 255, 0, 0.6);
+            --theme-dan: #dc2626; 
+            --theme-dan-glow: rgba(220, 38, 38, 0.6);
+            --bg-base: #070709;
+        }
+        body { 
+            background-color: var(--bg-base); 
+            color: #fff; 
+            font-family: 'Montserrat', sans-serif; 
+            overflow-x: hidden; 
+        }
+        
+        /* Ambient Background */
+        .ambient-map { 
+            position: fixed; inset: 0; z-index: -2; 
+            background-color: var(--theme-prim); 
+            -webkit-mask-image: url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_map_blank_without_borders.svg'); 
+            mask-image: url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_map_blank_without_borders.svg'); 
+            -webkit-mask-size: cover; mask-size: cover; opacity: 0.04; 
+        }
+        .ambient-lights { 
+            position: fixed; inset: 0; z-index: -1; 
+            background: radial-gradient(circle at 20% 30%, rgba(220, 38, 38, 0.15) 0%, transparent 50%), 
+                        radial-gradient(circle at 80% 70%, rgba(204, 255, 0, 0.12) 0%, transparent 50%); 
+            pointer-events: none; 
+            animation: breath-light 6s ease-in-out infinite alternate;
+        }
+        @keyframes breath-light { 0% { opacity: 0.6; transform: scale(1); } 100% { opacity: 1.2; transform: scale(1.1); } }
+
+        .brand-container {
+            display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem;
+            animation: brand-breath 2.5s ease-in-out infinite alternate; cursor: default;
+        }
+        @keyframes brand-breath {
+            0% { transform: scale(0.98); filter: drop-shadow(0 0 5px rgba(0,0,0,0)); }
+            100% { transform: scale(1.08); filter: drop-shadow(0 0 20px var(--theme-dan-glow)) drop-shadow(0 0 35px var(--theme-prim-glow)); }
+        }
+        .mr-text { color: var(--theme-dan); }
+        .raptor-text { color: var(--theme-prim); }
+
+        .glass-box-wrapper { position: relative; border-radius: 24px; animation: float-box 6s ease-in-out infinite; }
+        .glass-box-wrapper::before {
+            content: ''; position: absolute; inset: -2px; border-radius: 26px;
+            background: linear-gradient(45deg, transparent, var(--theme-prim), transparent, var(--theme-dan), transparent);
+            background-size: 300% 300%; z-index: -1; animation: border-glow-move 4s linear infinite; opacity: 0.5;
+        }
+        @keyframes border-glow-move { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .glass-box { 
+            background: linear-gradient(145deg, rgba(20, 20, 25, 0.8) 0%, rgba(10, 10, 12, 0.95) 100%); 
+            backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.05); 
+            border-radius: 24px; position: relative; z-index: 1;
+        }
+        @keyframes float-box { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
+        
+        .field-input { 
+            background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); color: white; 
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
+        .field-input:focus { 
+            background: rgba(204, 255, 0, 0.08); border-color: var(--theme-prim); outline: none; 
+            box-shadow: 0 0 20px rgba(204, 255, 0, 0.3); transform: scale(1.02) translateY(-2px);
+        }
+
+        .btn-main { 
+            background: linear-gradient(135deg, #ccff00 0%, #99cc00 100%); color: #000; 
+            transition: all 0.3s ease; position: relative; overflow: hidden; z-index: 1;
+        }
+        .btn-main:hover:not(:disabled) { transform: translateY(-3px) scale(1.03); box-shadow: 0 10px 30px rgba(204, 255, 0, 0.5); }
+        .btn-main:active:not(:disabled) { transform: translateY(1px) scale(0.98); }
+        .btn-main:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(80%); transform: none; }
+        
+        .ripple { position: absolute; border-radius: 50%; background: rgba(255, 255, 255, 0.6); transform: scale(0); animation: ripple-anim 0.6s linear; pointer-events: none; }
+        @keyframes ripple-anim { to { transform: scale(4); opacity: 0; } }
+
+        .process-container { overflow: hidden; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); max-height: 0; opacity: 0; }
+        .process-container.active { max-height: 200px; opacity: 1; margin-top: 1.5rem; }
+        .progress-bar-bg { background: rgba(255,255,255,0.05); border-radius: 8px; height: 8px; width: 100%; overflow: hidden; margin-top: 12px; }
+        .progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #99cc00, #ccff00); box-shadow: 0 0 15px var(--theme-prim); transition: width 0.4s ease; position: relative; }
+
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(204,255,0,0.4); border-radius: 10px; }
+        .custom-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
+
+        .fade-in { animation: fadeIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; opacity: 0; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(30px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        
+        #qr-canvas-container canvas { border: 4px solid #ccff00; border-radius: 12px; box-shadow: 0 0 25px rgba(204,255,0,0.3); transition: opacity 0.3s ease; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div class="ambient-map"></div>
+    <div class="ambient-lights"></div>
+
+    <header class="w-full text-center fade-in z-10 pb-8 pt-4">
+        <div class="flex flex-col items-center gap-1">
+            <div class="brand-container">
+                <h1 class="text-5xl md:text-6xl font-black mr-text tracking-tight">Mr.</h1>
+                <h1 class="text-5xl md:text-6xl font-black raptor-text tracking-tight">Raptor</h1>
+            </div>
+            <p class="text-[10px] md:text-xs text-[#ccff00] font-bold tracking-[0.3em] uppercase mt-2 opacity-80">Premium VPN Portal</p>
+        </div>
+    </header>
+
+    <main class="w-full max-w-lg relative z-10 space-y-6 mb-10">
+        
+        <!-- BUILDER SECTION -->
+        <div id="builder-section" class="glass-box-wrapper fade-in">
+            <section class="glass-box p-7">
+                <div class="mb-6 relative group">
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 pl-1 transition-colors duration-300 group-hover:text-[#ccff00]">Profile Name (အမည်ပေးရန်)</label>
+                    <input type="text" id="input-name" placeholder="Leave empty for auto-generated name" class="w-full field-input rounded-xl px-4 py-3.5 text-sm font-bold tracking-wide placeholder-gray-600">
+                </div>
+                
+                <button id="btn-generate" class="btn-main w-full py-4 rounded-xl font-black uppercase tracking-widest text-sm flex justify-center items-center gap-2">
+                    ⚡ <span id="btn-text">Generate Secure Configs</span>
+                </button>
+
+                <!-- Process UI -->
+                <div id="process-ui" class="process-container bg-black/40 rounded-xl p-5 border border-white/10">
+                    <div class="flex justify-between items-center mb-1">
+                        <span id="status-icon" class="inline-block animate-pulse text-[#ccff00]">⚡</span>
+                        <span id="status-percent" class="text-sm font-black text-[#ccff00] tracking-wider">0%</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div id="progress-fill" class="progress-bar-fill"></div>
+                    </div>
+                    <div id="status-text" class="text-xs text-gray-300 font-bold uppercase tracking-widest mt-3 text-center">Initializing...</div>
+                </div>
+                
+                <p id="error-msg" class="text-red-500 font-bold text-xs mt-4 text-center hidden bg-red-500/10 py-3 rounded-lg border border-red-500/30 shadow-[0_0_15px_rgba(220,38,38,0.2)]"></p>
+            </section>
+        </div>
+
+        <!-- RESULT SECTION -->
+        <div id="result-section" class="glass-box-wrapper fade-in hidden">
+            <section class="glass-box p-7">
+                <div class="text-center mb-6 border-b border-white/10 pb-6">
+                    <span class="bg-[#ccff00]/20 text-[#ccff00] border border-[#ccff00]/40 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] inline-block mb-3 animate-bounce">Setup Completed</span>
+                    <h3 class="text-white font-black text-xl tracking-wide drop-shadow-md mb-4">Your VPN Profiles are Ready!</h3>
+                    
+                    <!-- QR Code Slider System -->
+                    <div class="flex flex-col items-center justify-center gap-2">
+                        <div id="qr-canvas-container" class="bg-white p-2 rounded-xl relative">
+                            <canvas id="qr-code-canvas"></canvas>
+                        </div>
+                        
+                        <!-- Slider Controls -->
+                        <div class="flex items-center justify-center gap-4 mt-3 w-full">
+                            <button id="btn-prev" class="px-4 py-2.5 bg-white/10 hover:bg-[#ccff00] hover:text-black rounded-lg font-black transition-all duration-300 disabled:opacity-30 disabled:hover:bg-white/10 disabled:hover:text-white text-xs uppercase tracking-widest">&larr; Prev</button>
+                            <span id="qr-counter" class="text-xs font-black text-[#ccff00] tracking-widest bg-black/50 px-3 py-1.5 rounded-md border border-[#ccff00]/30">1 / 20</span>
+                            <button id="btn-next" class="px-4 py-2.5 bg-white/10 hover:bg-[#ccff00] hover:text-black rounded-lg font-black transition-all duration-300 disabled:opacity-30 disabled:hover:bg-white/10 disabled:hover:text-white text-xs uppercase tracking-widest">Next &rarr;</button>
+                        </div>
+                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-2">Scan QR to connect instantly</p>
+                    </div>
+                </div>
+                
+                <!-- ZIP Download Section -->
+                <div class="mb-6">
+                    <button id="dl-zip" class="w-full py-4 btn-main rounded-xl text-xs uppercase tracking-widest font-black flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(204,255,0,0.25)]">
+                        📥 Download All Configs (.ZIP)
+                    </button>
+                    <p class="text-[10px] text-center text-gray-400 mt-3 font-bold uppercase tracking-wide">Imports directly into WireGuard App</p>
+                </div>
+
+                <!-- User Guide -->
+                <div class="bg-black/60 border border-white/10 rounded-2xl overflow-hidden group hover:border-[#ccff00]/30 transition-colors duration-500">
+                    <div class="flex items-center justify-between p-3.5 bg-black/50 border-b border-white/10">
+                        <span class="text-[#ccff00] text-[11px] font-bold uppercase tracking-widest flex items-center gap-2">📋 အသုံးပြုနည်း လမ်းညွှန် (Guide)</span>
+                        <button id="btn-copy" class="text-[10px] bg-white/10 hover:bg-[#ccff00] hover:text-black px-3 py-1.5 rounded-lg uppercase font-bold transition-all duration-300">Copy Guide</button>
+                    </div>
+                    <textarea id="guide-box" readonly class="w-full bg-transparent p-4 text-[12px] text-gray-300 font-mono custom-scroll h-80 focus:outline-none resize-none leading-relaxed transition-colors duration-300 group-hover:text-white"></textarea>
+                </div>
+                
+                <!-- Reset Button -->
+                <button id="btn-reset" class="mt-6 w-full py-3 bg-white/5 hover:bg-white/15 text-gray-300 rounded-xl text-xs uppercase tracking-widest font-bold transition-all duration-300 hover:tracking-[0.2em] border border-white/5 hover:border-white/20">
+                    ← Create Another Profile
+                </button>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        const App = (() => {
+            // သင့် Worker URL ဖြင့် အစားထိုးပါ
+            const WORKER_URL = "https://curly-bonus-7ec5.zaychox9star.workers.dev";
+            
+            // နိုင်ငံတကာ IPs များနှင့် Ports များ (ပိတ်ဆို့မှုကျော်လွှားရန်)
+            const IPS = [
+                "engage.cloudflareclient.com", "162.159.192.1", "188.114.97.96", 
+                "162.159.193.1", "8.20.101.221", "8.21.13.143", "162.159.192.76", 
+                "162.159.192.83", "188.114.96.119", "188.114.96.120"
+            ];
+            const PORTS = [
+                2408, 500, 4500, 1701, 864, 880, 894, 934, 1070, 1180, 
+                3476, 3581, 4198, 5279, 5956, 7103, 7152, 7559, 8319, 8854, 8886
+            ];
+
+            let generatedZipBlob = null;
+            let batchName = "";
+            let generatedConfigs = []; // Array သိမ်းရန်
+            let currentQrIndex = 0;    // QR Slider အညွှန်း
+
+            // UI Elements
+            const UI = {
+                inName: document.getElementById('input-name'),
+                btnGen: document.getElementById('btn-generate'),
+                btnText: document.getElementById('btn-text'),
+                processUI: document.getElementById('process-ui'),
+                progFill: document.getElementById('progress-fill'),
+                statusText: document.getElementById('status-text'),
+                statusPercent: document.getElementById('status-percent'),
+                errorMsg: document.getElementById('error-msg'),
+                resSection: document.getElementById('result-section'),
+                builderSection: document.getElementById('builder-section'),
+                guideBox: document.getElementById('guide-box'),
+                dlZip: document.getElementById('dl-zip'),
+                btnCopy: document.getElementById('btn-copy'),
+                btnReset: document.getElementById('btn-reset'),
+                qrCanvas: document.getElementById('qr-code-canvas'),
+                btnPrev: document.getElementById('btn-prev'),
+                btnNext: document.getElementById('btn-next'),
+                qrCounter: document.getElementById('qr-counter')
+            };
+
+            // Audio System
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const playTone = (type, freq1, freq2, duration) => {
+                try {
+                    if(audioCtx.state === 'suspended') audioCtx.resume();
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain); gain.connect(audioCtx.destination);
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq1, audioCtx.currentTime);
+                    if(freq2) osc.frequency.exponentialRampToValueAtTime(freq2, audioCtx.currentTime + duration);
+                    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+                    osc.start(); osc.stop(audioCtx.currentTime + duration);
+                } catch(e){}
+            };
+
+            // Button Click Effect
+            const createRipple = (e, el) => {
+                const circle = document.createElement('span');
+                const d = Math.max(el.clientWidth, el.clientHeight);
+                circle.style.width = circle.style.height = `${d}px`;
+                circle.style.left = `${e.clientX - el.getBoundingClientRect().left - d/2}px`;
+                circle.style.top = `${e.clientY - el.getBoundingClientRect().top - d/2}px`;
+                circle.classList.add('ripple');
+                const r = el.getElementsByClassName('ripple')[0];
+                if(r) r.remove();
+                el.appendChild(circle);
+            };
+
+            const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+            const updateProgress = async (percent, text) => {
+                UI.progFill.style.width = `${percent}%`;
+                UI.statusPercent.innerText = `${percent}%`;
+                UI.statusText.innerText = text;
+                await sleep(400);
+            };
+
+            // ရိုးရှင်းသော အသုံးပြုနည်း လမ်းညွှန်
+            const buildGuideText = (name) => `🛡️ MR.RAPTOR PREMIUM VPN 🛡️
+(Profile: ${name})
+========================================
+
+📥 [၁] လိုအပ်သော App ဒေါင်းလုဒ်ရယူရန်
+• Android (Play Store):
+https://play.google.com/store/apps/details?id=com.wireguard.android
+
+• iOS / Mac (App Store):
+https://apps.apple.com/us/app/wireguard/id1441195209
+
+• Windows (PC):
+https://download.wireguard.com/windows-client/wireguard-installer.exe
+
+
+⚙️ [၂] ဖုန်း (Mobile) တွင် ထည့်သွင်းအသုံးပြုနည်း
+
+နည်းလမ်း (က) ZIP ဖိုင်ဖြင့် သွင်းနည်း (အကြံပြုသည်)
+၁။ ယခုစာမျက်နှာရှိ "DOWNLOAD ALL CONFIGS (.ZIP)" ကို နှိပ်၍ ဖိုင်ကို ဒေါင်းလုဒ်လုပ်ပါ။
+၂။ ဒေါင်းလုဒ်ဆွဲထားသော WireGuard App ကို ဖွင့်ပါ။
+၃။ အပေါင်းလက္ခဏာ (+) ကို နှိပ်ပါ။
+၄။ "Import from file or archive" ကိုရွေးချယ်ပြီး ခုနက ဒေါင်းလုဒ်ဆွဲထားသော .zip ဖိုင်ကို ရွေးချယ်ပါ။
+၅။ ဖိုင်ပေါင်း ၂၀ ခုလုံး App ထဲသို့ အလိုအလျောက် ဝင်လာပါမည်။
+
+နည်းလမ်း (ခ) QR Code ဖြင့် သွင်းနည်း (Slider အသုံးပြုနည်း)
+၁။ အခြားဖုန်း သို့မဟုတ် ကွန်ပျူတာ မျက်နှာပြင်ပေါ်တွင် ဤစာမျက်နှာကို ဖွင့်ထားပါ။
+၂။ မိမိ VPN သုံးမည့်ဖုန်းမှ WireGuard App ကိုဖွင့်ပြီး အပေါင်းလက္ခဏာ (+) ကိုနှိပ်ကာ "Scan from QR code" ကိုရွေးချယ်ပါ။
+၃။ မျက်နှာပြင်ပေါ်တွင် ပေါ်နေသော QR Code ကို Scan ဖတ်ပါ။ နောက်ထပ် QR ကို လိုချင်ပါက Next / Prev ခလုတ်များကို နှိပ်၍ ပြောင်းလဲ Scan ဖတ်နိုင်ပါသည်။
+
+
+💻 [၃] ကွန်ပျူတာ (Windows/PC) တွင် ထည့်သွင်းအသုံးပြုနည်း
+၁။ ကွန်ပျူတာတွင် WireGuard App ကို Install လုပ်ပြီး ဖွင့်ပါ။
+၂။ "DOWNLOAD ALL CONFIGS (.ZIP)" ကို နှိပ်၍ ဖိုင်ကို ဒေါင်းလုဒ်လုပ်ပါ။
+၃။ WireGuard App ၏ ဘယ်ဘက်အောက်ထောင့်ရှိ "Import tunnel(s) from file" ကိုနှိပ်ပါ။
+၄။ ဒေါင်းလုဒ်လုပ်ထားသော .zip ဖိုင်ကို ရွေးချယ်လိုက်ပါက အားလုံး ဝင်လာပါမည်။
+
+
+🔄 [၄] အရေးကြီး - VPN ချိတ်ဆက်၍မရပါက ဖြေရှင်းနည်း
+- သွင်းထားသော ဖိုင်များထဲမှ WP-01 မှစ၍ ကြိုက်နှစ်သက်ရာ တစ်ခုကို ဖွင့် (Activate) ပြီး အသုံးပြုနိုင်ပါပြီ။
+- အကယ်၍ လိုင်းမတက်ပါက (သို့) ချိတ်ဆက်၍မရပါက၊ ယခုဖွင့်ထားသော ဖိုင်ကိုပိတ် (Deactivate) ပြီး နောက်တစ်ခု (ဥပမာ- WP-02, WP-03) ကို ပြောင်းဖွင့်ကြည့်ပါ။
+- တခုမဟုတ် တခု သေချာပေါက် ချိတ်ဆက်မိပါမည်။ ချိတ်မရပါက တခုချင်းစီ လိုက်ဖွင့်ကြည့်ပေးပါ။
+
+★ CREATED BY MR.RAPTOR ★`;
+
+            // QR Code ကို Canvas ပေါ်တွင် ဆွဲသားခြင်း (Label ပါဝင်သည်)
+            const renderQRCode = (index) => {
+                if (generatedConfigs.length === 0) return;
+                
+                const config = generatedConfigs[index];
+                const qr = new QRious({ value: config.data, size: 300, level: 'M' });
+                const canvas = UI.qrCanvas;
+                const ctx = canvas.getContext('2d');
+                const size = 300;
+                const paddingBottom = 40;
+                
+                // Animation effect
+                canvas.style.opacity = 0;
+                
+                setTimeout(() => {
+                    canvas.width = size;
+                    canvas.height = size + paddingBottom;
+                    
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    const qrImg = new Image();
+                    qrImg.onload = () => {
+                        ctx.drawImage(qrImg, 0, 0);
+                        ctx.fillStyle = '#000000';
+                        ctx.font = 'bold 20px Montserrat, sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(`Profile: ${config.name}`, size / 2, size + 25);
+                        canvas.style.opacity = 1; // Show canvas
+                    };
+                    qrImg.src = qr.toDataURL();
+                    
+                    // Update Slider UI
+                    UI.qrCounter.innerText = `${index + 1} / ${generatedConfigs.length}`;
+                    UI.btnPrev.disabled = index === 0;
+                    UI.btnNext.disabled = index === (generatedConfigs.length - 1);
+                }, 150);
+            };
+
+            // Slider Controls Actions
+            const handlePrev = (e) => {
+                playTone('sine', 300, 50, 0.03);
+                if (e) createRipple(e, UI.btnPrev);
+                if (currentQrIndex > 0) {
+                    currentQrIndex--;
+                    renderQRCode(currentQrIndex);
+                }
+            };
+
+            const handleNext = (e) => {
+                playTone('sine', 300, 50, 0.03);
+                if (e) createRipple(e, UI.btnNext);
+                if (currentQrIndex < generatedConfigs.length - 1) {
+                    currentQrIndex++;
+                    renderQRCode(currentQrIndex);
+                }
+            };
+
+            // Main Generation Process
+            const generateConfigs = async (e) => {
+                playTone('sine', 400, 50, 0.04);
+                if(e) createRipple(e, UI.btnGen);
+
+                let inputVal = UI.inName.value.trim();
+                batchName = inputVal ? inputVal : "WP";
+                
+                UI.btnGen.disabled = true;
+                UI.btnText.innerText = "Processing...";
+                UI.errorMsg.classList.add('hidden');
+                UI.processUI.classList.add('active');
+                
+                try {
+                    await updateProgress(15, "Generating Keys...");
+                    const keyPair = nacl.box.keyPair();
+                    const privateKey = btoa(String.fromCharCode(...keyPair.secretKey));
+                    const publicKey = btoa(String.fromCharCode(...keyPair.publicKey));
+                    const genUUID = () => crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16); });
+
+                    await updateProgress(40, "Registering Account...");
+                    const cleanUrl = WORKER_URL.endsWith('/') ? WORKER_URL.slice(0, -1) : WORKER_URL;
+                    const res = await fetch(`${cleanUrl}/api/generate`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ key: publicKey, install_id: genUUID(), fcm_token: `${genUUID()}:APA91b${genUUID()}`, tos: new Date().toISOString() })
+                    });
+                    const data = await res.json();
+                    if (!res.ok || !data.success) throw new Error(data.error || "API Response Failed");
+
+                    await updateProgress(70, "Compiling Configs...");
+                    
+                    const zip = new JSZip();
+                    generatedConfigs = [];
+                    const enhancedDNS = "1.1.1.1, 8.8.8.8, 8.8.4.4";
+                    
+                    // Loop 20 times for dynamic IP/Port assignments
+                    for (let i = 1; i <= 20; i++) {
+                        const rIP = IPS[Math.floor(Math.random() * IPS.length)];
+                        const rPort = PORTS[Math.floor(Math.random() * PORTS.length)];
+                        const configName = `${batchName}-${i.toString().padStart(2, '0')}`;
+                        
+                        // IPv4 Standard WG Configuration
+                        const configStr = `[Interface]
+PrivateKey = ${privateKey}
+Address = ${data.data.ipv4}/32
+DNS = ${enhancedDNS}
+MTU = 1280
+
+[Peer]
+PublicKey = ${data.data.server_public_key}
+AllowedIPs = 0.0.0.0/0
+Endpoint = ${rIP}:${rPort}
+PersistentKeepalive = 25`;
+
+                        generatedConfigs.push({ name: configName, data: configStr });
+                        zip.file(`${configName}.conf`, configStr);
+                    }
+
+                    await updateProgress(90, "Packaging Data...");
+                    generatedZipBlob = await zip.generateAsync({type: "blob"});
+                    
+                    // Render first QR Code
+                    currentQrIndex = 0;
+                    renderQRCode(currentQrIndex);
+                    
+                    await updateProgress(100, "Done!");
+                    playTone('triangle', 440, null, 0.1); setTimeout(()=>playTone('triangle', 659.25, null, 0.3), 100);
+
+                    UI.processUI.classList.remove('active');
+                    UI.builderSection.classList.add('hidden');
+                    
+                    UI.guideBox.value = buildGuideText(batchName);
+                    UI.resSection.classList.remove('hidden');
+
+                } catch (error) {
+                    UI.errorMsg.innerText = `❌ Error: ${error.message}`;
+                    UI.errorMsg.classList.remove('hidden');
+                    UI.processUI.classList.remove('active');
+                } finally {
+                    UI.btnGen.disabled = false;
+                    UI.btnText.innerText = "Generate Secure Configs";
+                    UI.progFill.style.width = '0%';
+                }
+            };
+
+            // ZIP Download Action
+            const downloadZip = (e) => {
+                playTone('sine', 400, 50, 0.04);
+                if(e) createRipple(e, UI.dlZip);
+                if(!generatedZipBlob) return;
+
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(generatedZipBlob);
+                a.download = `${batchName}_WireGuard_Pack.zip`;
+                document.body.appendChild(a); 
+                a.click(); 
+                a.remove();
+            };
+
+            // Copy Guide Action
+            const copyGuide = async (e) => {
+                playTone('sine', 400, 50, 0.04);
+                try {
+                    await navigator.clipboard.writeText(UI.guideBox.value);
+                    const originalHTML = UI.btnCopy.innerHTML;
+                    UI.btnCopy.innerHTML = "Copied! ✅";
+                    UI.btnCopy.classList.replace('bg-white/10', 'bg-[#ccff00]');
+                    UI.btnCopy.classList.replace('text-white', 'text-black');
+                    setTimeout(() => {
+                        UI.btnCopy.innerHTML = originalHTML;
+                        UI.btnCopy.classList.replace('bg-[#ccff00]', 'bg-white/10');
+                        UI.btnCopy.classList.replace('text-black', 'text-white');
+                    }, 2000);
+                } catch (err) { alert("Please select the text and copy manually."); }
+            };
+
+            // Reset Form Action
+            const resetApp = () => {
+                playTone('sine', 400, 50, 0.04);
+                UI.resSection.classList.add('hidden');
+                UI.builderSection.classList.remove('hidden');
+                UI.inName.value = '';
+                generatedZipBlob = null;
+                generatedConfigs = [];
+            };
+
+            return {
+                init: () => {
+                    UI.btnGen.addEventListener('click', generateConfigs);
+                    UI.dlZip.addEventListener('click', downloadZip);
+                    UI.btnCopy.addEventListener('click', copyGuide);
+                    UI.btnReset.addEventListener('click', resetApp);
+                    UI.btnPrev.addEventListener('click', handlePrev);
+                    UI.btnNext.addEventListener('click', handleNext);
+                    UI.inName.addEventListener('keypress', (e) => { if(e.key === 'Enter') generateConfigs(e); });
+                }
+            };
+        })();
+
+        document.addEventListener('DOMContentLoaded', App.init);
+    </script>
+</body>
+</html>
